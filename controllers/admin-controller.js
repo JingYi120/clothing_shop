@@ -1,24 +1,31 @@
-const { Clothe } = require('../models')
+const { Clothe, Category } = require('../models')
 
 const adminController = {
   getClothes: (req, res, next) => {
     Clothe.findAll({
-      raw: true
+      raw: true,
+      nest: true,
+      include: [Category]
     })
       .then(clothes => res.render('admin/clothes', { clothes }))
       .catch(err => next(err))
   },
-  createClothe: (req, res) => {
-    return res.render('admin/create-clothe')
-  },
-  postClothe: (req, res, next) => {
-    const { name, description, price } = req.body
-    if (!name || !description || !price) throw new Error('All fields are required!')
-    Clothe.create({ 
-      name,
-      description,
-      price
+  createClothe: (req, res, next) => {
+    return Category.findAll({
+      raw: true
     })
+      .then(categories => res.render('admin/create-clothe', { categories }))
+      .catch(err => next(err))
+  }, 
+  postClothe: (req, res, next) => {
+    const { name, description, price, categoryId} = req.body
+    if (!name || !description || !price) throw new Error('All fields are required!')
+        Clothe.create({
+        name,
+        description,
+        price,
+        categoryId
+      })
       .then(() => {
         req.flash('success_messages', 'Item was successfully created')
         res.redirect('/admin/clothes')
@@ -27,7 +34,9 @@ const adminController = {
   },
   getClothe: (req, res, next) => {
     Clothe.findByPk(req.params.id, {
-      raw: true
+      raw: true,
+      nest: true,
+      include: [Category]
     })
       .then(clothe => {
         if (!clothe) throw new Error("Item didn't exist!")
@@ -36,17 +45,19 @@ const adminController = {
       .catch(err => next(err))
   }, 
   editClothe: (req, res, next) => {
-    Clothe.findByPk(req.params.id, {
-      raw: true
-    })
-      .then(clothe => {
+    return Promise.all([
+      Clothe.findByPk(req.params.id, { raw: true }),
+      Category.findAll({ raw: true }),
+    ])
+    
+      .then(([clothe, categories]) => {
         if (!clothe) throw new Error("Item didn't exist!")
-        res.render('admin/edit-clothe', { clothe })
+        res.render('admin/edit-clothe', { clothe, categories })
       })
       .catch(err => next(err))
   },
   putClothe: (req, res, next) => {
-    const { name, description, price } = req.body
+    const { name, description, price, categoryId } = req.body
     if (!name || !description || !price) throw new Error('All fields are required!')
     Clothe.findByPk(req.params.id)
       .then(clothe => {
@@ -54,7 +65,8 @@ const adminController = {
         return clothe.update({
           name,
           description,
-          price
+          price,
+          categoryId
         })
       })
       .then(() => {
