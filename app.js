@@ -7,6 +7,7 @@ const methodOverride = require('method-override')
 const session = require('express-session')
 const flash = require('connect-flash')
 const routes = require('./routes')
+const passport = require('./config/passport')
 
 const app = express()
 const port = 3000
@@ -18,6 +19,10 @@ app.use(session({
   resave: false,
   saveUninitialized: true
 }))
+
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.use(express.urlencoded({ extended: true }))
 app.use(methodOverride('_method'))
 
