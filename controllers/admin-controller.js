@@ -62,6 +62,15 @@ const adminController = {
         res.redirect('/admin/clothes')
       })
       .catch(err => next(err))
+  },
+  deleteClothe: (req, res, next) => {
+    return Clothe.findByPk(req.params.id)
+      .then(clothe => {
+        if (!clothe) throw new Error("Item didn't exist!")
+        return clothe.destroy()
+      })
+      .then(() => res.redirect('/admin/clothes'))
+      .catch(err => next(err))
   }
 }
 

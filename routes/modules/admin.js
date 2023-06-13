@@ -7,6 +7,7 @@ router.get('/clothes/create', adminController.createClothe)
 router.get('/clothes/:id/edit', adminController.editClothe)
 router.get('/clothes/:id', adminController.getClothe)
 router.put('/clothes/:id', adminController.putClothe)
+router.delete('/clothes/:id', adminController.deleteClothe)
 router.get('/clothes', adminController.getClothes)
 router.post('/clothes', adminController.postClothe)
 
