@@ -1,0 +1,19 @@
+<form action="/admin/clothes" method="POST">
+  <div class="mb-4 text-center">
+    <h1 class="h3 font-weight-normal mb-3">Create Item</h1>
+  </div>
+  <div class="form-row mb-3">
+    <label class="form-label" for="name">Name</label>
+    <input class="form-control" type="text" name="name" id="name" placeholder="Enter name" required>
+  </div>
+  <div class="form-row mb-3">
+    <label class="form-label" for="description">Description</label>
+    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+  </div>
+  <div class="form-row mb-3">
+    <label class="form-label" for="price">Price</label>
+    <input class="form-control" type="number" name="price" id="price" placeholder="Enter price">
+  </div>
+  
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
