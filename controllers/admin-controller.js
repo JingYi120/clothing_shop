@@ -24,6 +24,16 @@ const adminController = {
         res.redirect('/admin/clothes')
       })
       .catch(err => next(err))
+  },
+  getClothe: (req, res, next) => {
+    Clothe.findByPk(req.params.id, {
+      raw: true
+    })
+      .then(clothe => {
+        if (!clothe) throw new Error("Item didn't exist!")
+        res.render('admin/clothe', { clothe })
+      })
+      .catch(err => next(err))
   }
 }
 
