@@ -1,4 +1,4 @@
-const { Clothe, Category } = require('../models')
+const { Clothe, Category, User } = require('../models')
 
 const adminController = {
   getClothes: (req, res, next) => {
@@ -82,6 +82,31 @@ const adminController = {
         return clothe.destroy()
       })
       .then(() => res.redirect('/admin/clothes'))
+      .catch(err => next(err))
+  },
+  getUsers: (req, res, next) => {
+    return User.findAll({
+      raw: true,
+      nest: true
+    })
+      .then(users => res.render('admin/users', { users }))
+      .catch(err => next(err))
+  },
+  patchUser: (req, res, next) => {
+    return User.findByPk(req.params.id)
+      .then(user => {
+        if (!user) throw new Error("User didn't exist!")
+        if (user.email === '123@123') {
+          req.flash('error_messages', `Prohibit changing root's permissions`)
+          return res.redirect('back')
+        }
+
+        return user.update({ isAdmin: !user.isAdmin })
+      })
+      .then(() => {
+        req.flash('success_messages', 'The user permissions have been successfully updated.')
+        res.redirect('/admin/users')
+      })
       .catch(err => next(err))
   }
 }
