@@ -20,6 +20,13 @@
     {{/each}}
   </select>
 </div>
-
+<div class="form-row mb-3">
+  <label class="form-label" for="cover">Cover</label>
+  <input class="form-control" type="file" class="form-control-file" id="cover" name="cover" data-clothe-id="{{clothe.id}}">
+</div>
+<div class="form-row mb-3">
+  <label class="form-label" for="image">Image</label>
+  <input class="form-control" type="file" class="form-control-file" id="image" name="image" multiple data-clothe-id="{{clothe.id}}">
+</div>
 <button type="submit" class="btn btn-primary">Submit</button>
 <a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>

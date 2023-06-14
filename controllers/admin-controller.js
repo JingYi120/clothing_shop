@@ -1,4 +1,5 @@
-const { Clothe, Category, User } = require('../models')
+const { Clothe, Category, User, Image } = require('../models')
+const { imgurFileHandler } = require('../helpers/file-helpers')
 
 const adminController = {
   getClothes: (req, res, next) => {
@@ -17,20 +18,43 @@ const adminController = {
       .then(categories => res.render('admin/create-clothe', { categories }))
       .catch(err => next(err))
   }, 
-  postClothe: (req, res, next) => {
-    const { name, description, price, categoryId} = req.body
-    if (!name || !description || !price) throw new Error('All fields are required!')
-        Clothe.create({
+  postClothe: async (req, res, next) => {
+    try {
+      const { name, description, price, categoryId } = req.body;
+      if (!name || !description || !price) {
+        throw new Error('All fields are required!');
+      }
+
+      const { files } = req;
+      const { image } = files;
+
+      const coverPath = await imgurFileHandler(files.cover[0]);
+      const imagePaths = await Promise.all(image.map(file => imgurFileHandler(file)));
+
+      const clothe = await Clothe.create({
         name,
         description,
         price,
         categoryId
-      })
-      .then(() => {
-        req.flash('success_messages', 'Item was successfully created')
-        res.redirect('/admin/clothes')
-      })
-      .catch(err => next(err))
+      });
+
+      await Image.create({
+        name: coverPath,
+        clotheId: clothe.id
+      });
+
+      for (let i = 0; i < imagePaths.length; i++) {
+        await Image.create({
+          name: imagePaths[i],
+          clotheId: clothe.id
+        });
+      }
+
+      req.flash('success_messages', 'Item was successfully created');
+      res.redirect('/admin/clothes');
+    } catch (err) {
+      next(err);
+    }
   },
   getClothe: (req, res, next) => {
     Clothe.findByPk(req.params.id, {
