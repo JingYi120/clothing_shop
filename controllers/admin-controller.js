@@ -26,9 +26,9 @@ const adminController = {
       }
 
       const { files } = req;
-      const { image } = files;
+      const { cover, image } = files;
 
-      const coverPath = await imgurFileHandler(files.cover[0]);
+      const coverPath = await imgurFileHandler(cover[0]);
       const imagePaths = await Promise.all(image.map(file => imgurFileHandler(file)));
 
       const clothe = await Clothe.create({
@@ -40,13 +40,15 @@ const adminController = {
 
       await Image.create({
         name: coverPath,
-        clotheId: clothe.id
+        clotheId: clothe.id,
+        isCover: true
       });
 
       for (let i = 0; i < imagePaths.length; i++) {
         await Image.create({
           name: imagePaths[i],
-          clotheId: clothe.id
+          clotheId: clothe.id,
+          isCover: false 
         });
       }
 
@@ -58,46 +60,92 @@ const adminController = {
   },
   getClothe: (req, res, next) => {
     Clothe.findByPk(req.params.id, {
-      raw: true,
-      nest: true,
-      include: [Category]
+      include: [Category, Image]
     })
       .then(clothe => {
-        if (!clothe) throw new Error("Item didn't exist!")
-        res.render('admin/clothe', { clothe })
+        if (!clothe) throw new Error("Item didn't exist!");
+        res.render('admin/clothe', { clothe: clothe.toJSON() });
+        console.log(clothe.Images)
       })
-      .catch(err => next(err))
-  }, 
+      .catch(err => next(err));
+  },
   editClothe: (req, res, next) => {
     return Promise.all([
-      Clothe.findByPk(req.params.id, { raw: true }),
+      Clothe.findByPk(req.params.id, {include: Image}),
       Category.findAll({ raw: true }),
     ])
     
       .then(([clothe, categories]) => {
         if (!clothe) throw new Error("Item didn't exist!")
-        res.render('admin/edit-clothe', { clothe, categories })
+        res.render('admin/edit-clothe', { clothe: clothe.toJSON(), categories })
       })
       .catch(err => next(err))
   },
-  putClothe: (req, res, next) => {
-    const { name, description, price, categoryId } = req.body
-    if (!name || !description || !price) throw new Error('All fields are required!')
-    Clothe.findByPk(req.params.id)
-      .then(clothe => {
-        if (!clothe) throw new Error("Item didn't exist!")
-        return clothe.update({
-          name,
-          description,
-          price,
-          categoryId
-        })
-      })
-      .then(() => {
-        req.flash('success_messages', 'Item was successfully to update')
-        res.redirect('/admin/clothes')
-      })
-      .catch(err => next(err))
+  putClothe: async (req, res, next) => {
+    try {
+      const { name, description, price, categoryId } = req.body;
+      const { files } = req;
+      const { cover, image } = files;
+
+      if (!name || !description || !price) {
+        throw new Error('All fields are required!');
+      }
+
+      const clothe = await Clothe.findByPk(req.params.id);
+      if (!clothe) {
+        throw new Error("Item doesn't exist!");
+      }
+
+      await clothe.update({
+        name,
+        description,
+        price,
+        categoryId,
+      });
+
+      if (cover) {
+        const coverPath = await imgurFileHandler(cover[0]);
+        await Image.update(
+          {
+            name: coverPath,
+            isCover: true,
+          },
+          {
+            where: {
+              clotheId: clothe.id,
+              isCover: true,
+            },
+          }
+        );
+      }
+
+      if (image) {
+        const existingImages = await Image.findAll({
+          where: {
+            clotheId: clothe.id,
+            isCover: false,
+          },
+        });
+
+        if (existingImages.length + image.length > 5) {
+          throw new Error("Maximum image count reached 5");
+        }
+
+        for (const file of image) {
+          const imagePath = await imgurFileHandler(file);
+          await Image.create({
+            name: imagePath,
+            clotheId: clothe.id,
+            isCover: false,
+          });
+        }
+      }
+
+      req.flash('success_messages', 'Item was successfully updated');
+      res.redirect('/admin/clothes');
+    } catch (err) {
+      next(err);
+    }
   },
   deleteClothe: (req, res, next) => {
     return Clothe.findByPk(req.params.id)

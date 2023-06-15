@@ -1,19 +1,59 @@
-<a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>
+<div class="container">
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="well">
+        {{#each clothe.Images}}
+        {{#if isCover}}
+        <div class="position-relative">
+          <img class="img-fluid" src="{{name}}"
+            style="width: 100%; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;"
+            onload="this.style.opacity=1;">
+        </div>
+        {{/if}}
+        {{/each}}
+      </div>
+    </div>
 
-<form action="">
-<div class="row">
-  <div class="col-md-4">
-    <div class="well">
-      <img class="img-responsive center-block" src="{{clothe.Images}}"
-      style="width: 250px; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+    <div class="col-md-6">
+      <h2>{{clothe.Category.name}}</h2>
+      <h3>{{clothe.name}}</h3>
+      <p>{{clothe.description}}</p>
+      <h4>NT.{{clothe.price}}</h4>
+      <form action="/cart" method="POST">
+        <input type="hidden" name="clotheId" value="{{clothe.id}}">
+        <div class="form-group">
+          <label for="size">Size:</label>
+          <select class="form-control" id="size" name="size">
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quantity">Quantity:</label>
+          <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1">
+        </div>
+        <button type="submit" class="btn btn-primary my-2">Add to Cart</button>
+      </form>
     </div>
   </div>
 
-  <div class="col-md-8">
-    <p style="white-space: break-spaces;">{{clothe.Category.name}}</p>
-    <p style="white-space: break-spaces;">{{clothe.name}}</p>
-    <p style="white-space: break-spaces;">{{clothe.description}}</p>
-    <p style="white-space: break-spaces;">NT.{{clothe.price}}</p>
+  <div class="row">
+    {{#each clothe.Images}}
+    <div class="col-md-4">
+      <div class="position-relative">
+        <img class="img-fluid" src="{{name}}"
+          style="width: 100%; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+        <button class="btn btn-primary btn-sm position-absolute top-0 end-0 m-2" type="button">
+          {{#if isCover}}
+          Cover Photo
+          {{else}}
+          Normal Photo
+          {{/if}}
+        </button>
+      </div>
+    </div>
+    {{/each}}
   </div>
-  <hr>
 </div>

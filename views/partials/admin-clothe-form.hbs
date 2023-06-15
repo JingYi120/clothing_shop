@@ -1,6 +1,7 @@
 <div class="form-row mb-3">
   <label class="form-label" for="name">Name</label>
-  <input class="form-control" type="text" name="name" id="name" placeholder="Enter name" value="{{clothe.name}}" required>
+  <input class="form-control" type="text" name="name" id="name" placeholder="Enter name" value="{{clothe.name}}"
+    required>
 </div>
 <div class="form-row mb-3">
   <label class="form-label" for="description">Description</label>
@@ -14,7 +15,7 @@
   <label class="form-label" for="categoryId">Category</label>
   <select class="form-control" id="categoryId" name="categoryId">
     {{#each categories}}
-    <option value="{{this.id}}"{{#ifCond this.id ../clothe.categoryId}} selected {{/ifCond}}>
+    <option value="{{this.id}}" {{#ifCond this.id ../clothe.categoryId}} selected {{/ifCond}}>
       {{this.name}}
     </option>
     {{/each}}
@@ -22,11 +23,23 @@
 </div>
 <div class="form-row mb-3">
   <label class="form-label" for="cover">Cover</label>
-  <input class="form-control" type="file" class="form-control-file" id="cover" name="cover" data-clothe-id="{{clothe.id}}">
+  <input class="form-control" type="file" class="form-control-file" id="cover" name="cover"
+    data-clothe-id="{{clothe.id}}">
+  {{#each clothe.Images}}
+    {{#if isCover}}
+      <img src="{{name}}" alt="Cover Image" class="img-thumbnail mt-2" style="max-width: 200px;">
+    {{/if}}
+  {{/each}}
 </div>
 <div class="form-row mb-3">
   <label class="form-label" for="image">Image</label>
-  <input class="form-control" type="file" class="form-control-file" id="image" name="image" multiple data-clothe-id="{{clothe.id}}">
+  <input class="form-control" type="file" class="form-control-file" id="image" name="image" multiple
+    data-clothe-id="{{clothe.id}}">
+  {{#each clothe.Images}}
+    {{#unless isCover}}
+      <img src="{{name}}" alt="Image" class="img-thumbnail mt-2" style="max-width: 200px;">
+    {{/unless}}
+  {{/each}}
 </div>
 <button type="submit" class="btn btn-primary">Submit</button>
 <a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>

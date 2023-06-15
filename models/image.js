@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Image.init({
-    name: DataTypes.STRING
+    name: DataTypes.STRING,
+    isCover: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'Image',
