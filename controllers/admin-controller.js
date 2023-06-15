@@ -147,14 +147,16 @@ const adminController = {
       next(err);
     }
   },
-  deleteClothe: (req, res, next) => {
-    return Clothe.findByPk(req.params.id)
-      .then(clothe => {
-        if (!clothe) throw new Error("Item didn't exist!")
-        return clothe.destroy()
-      })
-      .then(() => res.redirect('/admin/clothes'))
-      .catch(err => next(err))
+  deleteClothe: async(req, res, next) => {
+    try{
+      const clothe = await Clothe.findByPk(req.params.id, { include: Image })
+      if (!clothe) throw new Error("Item didn't exist!")
+      await Promise.all(clothe.Images.map(image => image.destroy()))
+      await clothe.destroy()
+      res.redirect('/admin/clothes')
+    }catch(err){
+      next(err)
+    }
   },
   getUsers: (req, res, next) => {
     return User.findAll({
