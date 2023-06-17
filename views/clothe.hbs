@@ -1,0 +1,57 @@
+<div class="container">
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="well">
+        {{#each clothe.Images}}
+        {{#if isCover}}
+        <div class="position-relative">
+          <img class="img-fluid" src="{{name}}"
+            style="width: 100%; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;"
+            onload="this.style.opacity=1;">
+        </div>
+        {{/if}}
+        {{/each}}
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <h2>{{clothe.name}}</h2>
+      <span class="badge bg-secondary">{{clothe.Category.name}}</span>
+      <p>{{clothe.description}}</p>
+      <h4>NT.{{clothe.price}}</h4>
+      <form action="/cart" method="POST">
+        <input type="hidden" name="clotheId" value="{{clothe.id}}">
+        <div class="form-group">
+          <label for="quantity">Quantity:</label>
+          <input type="number" class="form-control my-3" id="quantity" name="quantity" value="1" min="1">
+        </div>
+        <button type="submit" class="btn btn-primary my-2">Add to Cart</button>
+      </form>
+    </div>
+  </div>
+
+<div class="row">
+  {{#each clothe.Images}}
+  {{#if isCover}}
+  <div class="col-md-12 d-flex align-items-center justify-content-center mb-4">
+    <div class="position-relative">
+      <img class="img-fluid" src="{{this.name}}"
+        style="width: 800px; height: auto; transition: opacity 0.5s; opacity: 0;" onload="this.style.opacity=1;">
+    </div>
+  </div>
+  {{/if}}
+  {{/each}}
+</div>
+
+<div class="row">
+  {{#each clothe.Images}}
+  {{#unless isCover}}
+  <div class="col-md-12 d-flex align-items-center justify-content-center mb-4">
+    <div class="position-relative">
+      <img class="img-fluid" src="{{this.name}}"
+        style="width: 800px; height: auto; transition: opacity 0.5s; opacity: 0;" onload="this.style.opacity=1;">
+    </div>
+  </div>
+  {{/unless}}
+  {{/each}}
+</div>
