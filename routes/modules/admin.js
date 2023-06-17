@@ -21,6 +21,7 @@ router.get('/categories', categoryController.getCategories)
 router.post('/categories', categoryController.postCategory)
 
 router.patch('/images/:id', imageController.patchImage)
+router.delete('/images/:id', imageController.deleteImage)
 
 router.patch('/users/:id', adminController.patchUser)
 router.get('/users', adminController.getUsers)

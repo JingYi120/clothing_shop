@@ -23,6 +23,15 @@ const imageController = {
     }catch(err){
       next(err)
     }
+  },
+  deleteImage: (req, res, next) => {
+    return Image.findByPk(req.params.id)
+      .then(image => {
+        if (!image) throw new Error("Image didn't exist!")
+        return image.destroy()
+      })
+      .then(deletedImage => res.redirect(`/admin/clothes/${deletedImage.clotheId}`))
+      .catch(err => next(err))
   }
 };
 
