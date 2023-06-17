@@ -45,13 +45,15 @@
       <div class="position-relative">
         <img class="img-fluid" src="{{name}}"
           style="width: 100%; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
-        <button class="btn btn-primary btn-sm position-absolute top-0 end-0 m-2" type="button">
+          <form action="/admin/images/{{this.id}}?_method=PATCH" method="POST" style="display: inline;">
+        <button class="btn btn-primary btn-sm position-absolute top-0 end-0 m-2" type="submit">
           {{#if isCover}}
           Cover Photo
           {{else}}
           Normal Photo
           {{/if}}
         </button>
+        </form>
       </div>
     </div>
     {{/each}}

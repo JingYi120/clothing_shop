@@ -65,7 +65,6 @@ const adminController = {
       .then(clothe => {
         if (!clothe) throw new Error("Item didn't exist!");
         res.render('admin/clothe', { clothe: clothe.toJSON() });
-        console.log(clothe.Images)
       })
       .catch(err => next(err));
   },

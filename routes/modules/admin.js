@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const adminController = require('../../controllers/admin-controller')
 const categoryController = require('../../controllers/category-controller')
+const imageController = require('../../controllers/​​image-controller')
 const upload = require('../../middleware/multer')
 
 
@@ -18,6 +19,8 @@ router.put('/categories/:id', categoryController.putCategory)
 router.delete('/categories/:id', categoryController.deleteCategory)
 router.get('/categories', categoryController.getCategories)
 router.post('/categories', categoryController.postCategory)
+
+router.patch('/images/:id', imageController.patchImage)
 
 router.patch('/users/:id', adminController.patchUser)
 router.get('/users', adminController.getUsers)

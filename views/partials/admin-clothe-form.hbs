@@ -23,23 +23,29 @@
 </div>
 <div class="form-row mb-3">
   <label class="form-label" for="cover">Cover</label>
-  <input class="form-control" type="file" class="form-control-file" id="cover" name="cover"
-    data-clothe-id="{{clothe.id}}">
-  {{#each clothe.Images}}
+  <input class="form-control" type="file" id="cover" name="cover" data-clothe-id="{{clothe.id}}">
+  <div class="image-container d-flex flex-row my-3">
+    {{#each clothe.Images}}
     {{#if isCover}}
+    <div class="image-item position-relative">
       <img src="{{name}}" alt="Cover Image" class="img-thumbnail mt-2" style="max-width: 200px;">
+    </div>
     {{/if}}
-  {{/each}}
+    {{/each}}
+  </div>
 </div>
 <div class="form-row mb-3">
   <label class="form-label" for="image">Image</label>
-  <input class="form-control" type="file" class="form-control-file" id="image" name="image" multiple
-    data-clothe-id="{{clothe.id}}">
-  {{#each clothe.Images}}
+  <input class="form-control" type="file" id="image" name="image" multiple data-clothe-id="{{clothe.id}}">
+  <div class="image-container d-flex flex-row my-3">
+    {{#each clothe.Images}}
     {{#unless isCover}}
+    <div class="image-item position-relative">
       <img src="{{name}}" alt="Image" class="img-thumbnail mt-2" style="max-width: 200px;">
+    </div>
     {{/unless}}
-  {{/each}}
+    {{/each}}
+  </div>
 </div>
 <button type="submit" class="btn btn-primary">Submit</button>
 <a class="btn btn-outline-secondary" href="javascript:history.back()">Back</a>
