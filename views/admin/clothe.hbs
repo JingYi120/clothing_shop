@@ -15,8 +15,8 @@
     </div>
 
     <div class="col-md-6">
-      <h2>{{clothe.Category.name}}</h2>
-      <h3>{{clothe.name}}</h3>
+      <h2>{{clothe.name}}</h2>
+      <h3>{{clothe.Category.name}}</h3>
       <p>{{clothe.description}}</p>
       <h4>NT.{{clothe.price}}</h4>
       <form action="/cart" method="POST">
@@ -41,9 +41,10 @@
 
 <div class="row">
   {{#each clothe.Images}}
+  {{#if isCover}}
   <div class="col-md-4">
     <div class="position-relative">
-      <img class="img-fluid" src="{{name}}"
+      <img class="img-fluid" src="{{this.name}}"
         style="width: 100%; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
       <form action="/admin/images/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
         <button class="btn btn-danger btn-sm position-absolute top-0 start-0 m-2" type="submit">
@@ -52,14 +53,31 @@
       </form>
       <form action="/admin/images/{{this.id}}?_method=PATCH" method="POST" style="display: inline;">
         <button class="btn btn-primary btn-sm position-absolute top-0 end-0 m-2" type="submit">
-          {{#if isCover}}
           Cover Photo
-            {{else}}
-              Normal Photo
-          {{/if}}
         </button>
       </form>
     </div>
   </div>
+  {{/if}}
+  {{/each}}
+  {{#each clothe.Images}}
+    {{#unless isCover}}
+      <div class="col-md-4">
+        <div class="position-relative">
+          <img class="img-fluid" src="{{this.name}}"
+            style="width: 100%; margin-bottom: 25px; transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
+          <form action="/admin/images/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
+            <button class="btn btn-danger btn-sm position-absolute top-0 start-0 m-2" type="submit">
+              X
+            </button>
+          </form>
+          <form action="/admin/images/{{this.id}}?_method=PATCH" method="POST" style="display: inline;">
+            <button class="btn btn-primary btn-sm position-absolute top-0 end-0 m-2" type="submit">
+                  Normal Photo
+            </button>
+          </form>
+        </div>
+      </div>
+    {{/unless}}
   {{/each}}
 </div>

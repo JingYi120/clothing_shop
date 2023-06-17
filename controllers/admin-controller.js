@@ -169,7 +169,7 @@ const adminController = {
     return User.findByPk(req.params.id)
       .then(user => {
         if (!user) throw new Error("User didn't exist!")
-        if (user.email === '123@123') {
+        if (user.email === 'root@example.com') {
           req.flash('error_messages', `Prohibit changing root's permissions`)
           return res.redirect('back')
         }
