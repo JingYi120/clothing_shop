@@ -1,0 +1,32 @@
+<div class="card mb-3">
+  <div class="row no-gutters">
+    <div class="col-md-4">
+      <img src="/public/user.png" width="300px" height="300px"
+        style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;" />
+    </div>
+    <div class="col-md-8">
+      <div class="card-body">
+        <h5 class="card-title">{{user.name}}</h5>
+        <p class="card-text">
+          {{user.email}}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <ul class="nav nav-pills">
+      <li class="nav-item">
+        <a class="nav-link {{#ifCond '' categoryId}}active{{/ifCond}}" href="?categoryId=">Favorite</a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link {{#ifCond this.id ../categoryId}}active{{/ifCond}}"
+          href="?categoryId={{this.id}}">Orders</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
