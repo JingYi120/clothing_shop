@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const clotheController = require('../controllers/clothe-controller')
 const userController = require('../controllers/user-controller')
+const orderController = require('../controllers/order-controller')
 const passport = require('../config/passport')
 const admin = require('./modules/admin')
 const { authenticated, authenticatedAdmin } = require('../middleware/auth')
@@ -16,6 +17,8 @@ router.post('/signin', passport.authenticate('local', { failureRedirect: '/signi
 router.get('/logout', userController.logout)
 
 router.get('/users/:id', authenticated, userController.getUser)
+
+router.get('/orders', authenticated, orderController.getOrders)
 
 router.get('/clothes/:id', authenticated, clotheController.getClothe)
 router.get('/clothes', authenticated, clotheController.getClothes)
