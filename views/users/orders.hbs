@@ -1,0 +1,32 @@
+{{>user-tabs route='orders'}}
+
+<table class="table align-middle">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Order Date</th>
+      <th scope="col">Status</th>
+      <th scope="col">  </th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each user.Orders}}
+    <tr>
+      <th scope="row">{{this.id}}</th>
+      <td>{{this.createdAt}}</td>
+      {{#if isDone}}
+      <td>處理中</td>
+      {{else}}
+      <td>已完成</td>
+      {{/if}}
+      <td>
+        <button type="button" class="btn btn-link">
+          <a class="btn btn-link link-primary" href="/users/order/{{this.id}}">
+            Detail
+          </a>
+        </button>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

@@ -1,32 +1,11 @@
-{{>user-tabs route='orders'}}
-
-<table class="table align-middle">
-  <thead class="thead-dark">
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Order Date</th>
-      <th scope="col">Status</th>
-      <th scope="col"></th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each orders}}
-    <tr>
-      <th scope="row">{{this.id}}</th>
-      <td>{{this.createdAt}}</td>
-      {{#if isDone}}
-      <td>處理中</td>
-      {{else}}
-      <td>已完成</td>
-      {{/if}}
-      <td>
-        <button type="button" class="btn btn-link">
-          <a class="btn btn-link link-primary" href="/admin/clothes/{{this.id}}">
-            Detail
-          </a>
-        </button>
-      </td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
+<ul class="list-group">
+  {{#each order.OrderDetails}}
+  <li class="list-group-item">
+    <div class="d-flex justify-content-between align-items-center">
+      <span>{{this.Clothe.name}}</span>
+      <span class="badge badge-primary badge-pill">{{this.quantity}}</span>
+    </div>
+    <p class="mb-0">total: NT. {{this.Clothe.price}}</p>
+  </li>
+  {{/each}}
+</ul>
