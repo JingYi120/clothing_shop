@@ -1,10 +1,15 @@
 const { Clothe, Category, Image } = require('../models')
+const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const clotheController = {
   getClothes: (req, res, next) => {
+    const DEFAULT_LIMIT = 9
     const categoryId = Number(req.query.categoryId) || ''
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || DEFAULT_LIMIT
+    const offset = getOffset(limit, page)
     return Promise.all([
-      Clothe.findAll({
+      Clothe.findAndCountAll({
         include: Category,
           where: {
             ...categoryId ? { categoryId } : {}
@@ -13,6 +18,8 @@ const clotheController = {
           model: Image,
           where: { isCover: true },
         },
+        limit,
+        offset,
         nest: true,
         raw: true
       }),
@@ -20,9 +27,10 @@ const clotheController = {
     ])
       .then(([clothes,categories]) => {
         res.render('clothes', {
-          clothes,
+          clothes: clothes.rows,
           categories,
-          categoryId
+          categoryId,
+          pagination: getPagination(limit, page, clothes.count)
         })
       })
       .catch(err => next(err))
