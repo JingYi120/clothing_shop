@@ -2,15 +2,30 @@ const { Clothe, Category, Image } = require('../models')
 
 const clotheController = {
   getClothes: (req, res, next) => {
-    return Clothe.findAll({
-      include: [Category, Image],
-      nest: true,
-      raw: true
-    })
-    .then(clothes => {
-        res.render('clothes', {clothes})
-    })
-    .catch(err => next(err))
+    const categoryId = Number(req.query.categoryId) || ''
+    return Promise.all([
+      Clothe.findAll({
+        include: Category,
+          where: {
+            ...categoryId ? { categoryId } : {}
+        },
+        include: {
+          model: Image,
+          where: { isCover: true },
+        },
+        nest: true,
+        raw: true
+      }),
+      Category.findAll({ raw: true })
+    ])
+      .then(([clothes,categories]) => {
+        res.render('clothes', {
+          clothes,
+          categories,
+          categoryId
+        })
+      })
+      .catch(err => next(err))
   }, 
   getClothe: (req, res, next) => {
     return Clothe.findByPk(req.params.id, {
