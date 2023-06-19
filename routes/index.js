@@ -18,6 +18,7 @@ router.get('/logout', userController.logout)
 
 router.get('/orderDetails', authenticated, orderDetailController.getOrderDetails)
 router.post('/orderDetails', authenticated, orderDetailController.postOrderDetail)
+router.delete('/orderDetails/:id', orderDetailController.deleteOrderDetail)
 
 router.patch('/users/order/:id', authenticated, userController.getOrder)
 router.get('/users/:id/orders', authenticated, userController.getOrders)

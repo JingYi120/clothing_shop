@@ -8,16 +8,23 @@
             {{#each orderDetails}}
             <li class="list-group-item mb-3">
               <div class="d-flex justify-content-between align-items-center">
-                <div class="pr-3">
+                <div class="pr-3 w-25">
                   <span>{{this.Clothe.name}}</span>
                 </div>
                 <div class="pr-3">
-                  <span class="d-block text-primary mb-2">Quantity: {{this.quantity}}</span>
+                  <div class="form-group row">
+                    <label for="quantity" class="col-sm-4 col-form-label">Quantity:</label>
+                    <div class="col-sm-8">
+                      <div class="input-group">
+                        <input type="number" class="form-control form-control-sm" id="quantity" name="quantity" value="{{this.quantity}}"
+                          min="1">
+                      </div>
+                    </div>
+                  </div>
                   <span class="d-block text-primary">Price: NT.{{this.Clothe.price}}</span>
                 </div>
                 <div class="btn-group" role="group">
-                  <a href="/admin/categories/{{this.id}}" class="btn btn-primary">Edit</a>
-                  <form action="/admin/categories/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
+                  <form action="/orderDetails/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
                     <button type="submit" class="btn btn-danger">Delete</button>
                   </form>
                 </div>

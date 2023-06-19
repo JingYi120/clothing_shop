@@ -56,6 +56,15 @@ const orderDetailController = {
     } catch (err) {
       next(err);
     }
+  },
+  deleteOrderDetail: (req, res, next) => {
+    return OrderDetail.findByPk(req.params.id)
+      .then(orderDetail => {
+        if (!orderDetail) throw new Error("Item didn't exist!")
+        return orderDetail.destroy()
+      })
+      .then(() => res.redirect('/orderDetails'))
+      .catch(err => next(err))
   }
 };
 
