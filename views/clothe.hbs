@@ -19,7 +19,7 @@
       <span class="badge bg-secondary">{{clothe.Category.name}}</span>
       <p>{{clothe.description}}</p>
       <h4>NT.{{clothe.price}}</h4>
-      <form action="/cart" method="POST">
+      <form action="/orderDetails" method="POST">
         <input type="hidden" name="clotheId" value="{{clothe.id}}">
         <div class="form-group">
           <label for="quantity">Quantity:</label>

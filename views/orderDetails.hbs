@@ -1,0 +1,38 @@
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-8">
+    <form action="/orderDetails" method="POST">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Order Details</h5>
+          <ul class="list-group list-group-flush">
+            {{#each orderDetails}}
+            <li class="list-group-item mb-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="pr-3">
+                  <span>{{this.Clothe.name}}</span>
+                </div>
+                <div class="pr-3">
+                  <span class="d-block text-primary mb-2">Quantity: {{this.quantity}}</span>
+                  <span class="d-block text-primary">Price: NT.{{this.Clothe.price}}</span>
+                </div>
+                <div class="btn-group" role="group">
+                  <a href="/admin/categories/{{this.id}}" class="btn btn-primary">Edit</a>
+                  <form action="/admin/categories/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </form>
+                </div>
+              </div>
+            </li>
+            {{/each}}
+          </ul>
+          <div class="card-footer">
+            <p class="mb-0">Total: NT.{{total}}</p>
+            <div class="btn-group float-right mt-3" role="group">
+              <button type="submit" class="btn btn-primary">Confirm</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
