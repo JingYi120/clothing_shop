@@ -20,6 +20,7 @@ router.get('/logout', userController.logout)
 router.get('/orderDetails', authenticated, orderDetailController.getOrderDetails)
 router.post('/orderDetails', authenticated, orderDetailController.postOrderDetail)
 
+router.get('/search', authenticated, clotheController.getSearch)
 
 router.post('/orders', authenticated, orderController.postOrder)
 router.get('/orders/:id/edit', authenticated, orderController.editOrder)

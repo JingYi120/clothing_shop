@@ -3,6 +3,11 @@
     <div class="container-fluid">
       <a class="navbar-brand" href="/">Clothing Shop</a>
       {{#if user}}
+      <form class="d-flex ms-4" action="/search" method="GET">
+        <input class="form-control me-2" type="search" name="keyword" placeholder="Enter Items' name" aria-label="Search"value={{ keyword }}>
+        <button class="btn btn-outline-light" type="submit">Search</button>
+      </form>
+      
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
         aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>

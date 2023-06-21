@@ -44,6 +44,38 @@ const clotheController = {
       res.render('clothe', { clothe: clothe.toJSON() })
     })
     .catch(err => next(err))
+  },
+  getSearch: (req, res, next) => {
+    const keyword = req.query.keyword 
+    const DEFAULT_LIMIT = 9
+    const page = Number(req.query.page) || 1
+    const limit = Number(req.query.limit) || DEFAULT_LIMIT
+    const offset = getOffset(limit, page)
+    return Clothe.findAndCountAll({
+      include: Category,
+      include: {
+        model: Image,
+        where: { isCover: true },
+      },
+      limit,
+      offset,
+      nest: true,
+      raw: true
+    })
+    .then(clothes => {
+      const searchClothes = clothes.rows.filter(clothe => {
+        return clothe.name.toLowerCase().includes(keyword.trim().toLowerCase())
+      })
+      const count = searchClothes.length
+      console.log('count',count)
+
+      res.render('search', {
+        clothes: searchClothes,
+        pagination: getPagination(limit, page, count),
+        keyword
+      })
+    })
+    .catch(err => next(err))
   }
 
 }
