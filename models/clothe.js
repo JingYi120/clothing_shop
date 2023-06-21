@@ -13,6 +13,11 @@ module.exports = (sequelize, DataTypes) => {
       Clothe.belongsTo(models.Category, { foreignKey: 'categoryId' })
       Clothe.hasMany(models.Image, { foreignKey: 'clotheId' })
       Clothe.hasMany(models.OrderDetail, { foreignKey: 'clotheId' })
+      Clothe.belongsToMany(models.User, {
+        through: models.Favorite,
+        foreignKey: 'restaurantId',
+        as: 'FavoritedUsers'
+      })
     }
   }
   Clothe.init({
