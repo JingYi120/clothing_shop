@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const { User, Order, OrderDetail, Clothe } = require('../models')
+const { getUser } = require('../helpers/auth-helpers')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -63,12 +64,19 @@ const userController = {
     .catch(err => next(err))
   },
   getOrder: (req, res, next) => {
-    Order.findByPk(req.params.id, 
-      { model: OrderDetail, include: Clothe }
-    )
+    const userId = getUser(req).id
+    return Order.findByPk(req.params.id,{ 
+      include: [
+        { model: OrderDetail, include: Clothe }
+    ]})
+
       .then(order => {
-        if (!order) throw new Error("Item didn't exist!");
-        res.render('users/order', { order: order.toJSON() });
+        if (!order) throw new Error("Order didn't exist!");
+
+        res.render('users/order', { 
+          order: order.toJSON(),
+          userId
+        });
       })
       .catch(err => next(err));
   }

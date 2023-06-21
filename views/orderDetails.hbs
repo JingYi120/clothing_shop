@@ -1,39 +1,35 @@
 <div class="row justify-content-center">
   <div class="col-md-6 col-lg-8">
-    <form action="/orderDetails" method="POST">
+    <form action="/orders" method="POST">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title mb-4">Order Details</h5>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title">Order Details</h5>
+            <a href="/orders/{{order.id}}/edit" class="btn btn-secondary">Edit</a>
+          </div>
           <ul class="list-group list-group-flush">
-            {{#each orderDetails}}
-            <li class="list-group-item mb-3">
-              <div class="d-flex justify-content-between align-items-center">
-                <div class="pr-3 w-25">
-                  <span>{{this.Clothe.name}}</span>
-                </div>
-                <div class="pr-3">
-                  <div class="form-group row">
-                    <label for="quantity" class="col-sm-4 col-form-label">Quantity:</label>
-                    <div class="col-sm-8">
-                      <div class="input-group">
-                        <input type="number" class="form-control form-control-sm" id="quantity" name="quantity" value="{{this.quantity}}"
-                          min="1">
+            {{#ifCond user.id userId}}
+                {{#each order.OrderDetails}}
+                  <li class="list-group-item mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                      <a class="pr-3 w-25" href="/clothes/{{this.Clothe.id}}">{{this.Clothe.name}}</a>
+                      <div class="pr-3">
+                        <span class="d-block text-primary">Quantity:{{this.quantity}}</span>
+                        <input type="hidden" name="quantity" value="{{this.quantity}}">
+                        <span class="d-block text-primary">Price: NT.{{this.Clothe.price}}</span>
+                        <input type="hidden" name="price" value="{{this.Clothe.price}}">
                       </div>
                     </div>
-                  </div>
-                  <span class="d-block text-primary">Price: NT.{{this.Clothe.price}}</span>
-                </div>
-                <div class="btn-group" role="group">
-                  <form action="/orderDetails/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                  </form>
-                </div>
-              </div>
-            </li>
-            {{/each}}
+                  </li>
+                {{/each}}
+            {{/ifCond}}
           </ul>
           <div class="card-footer">
             <p class="mb-0">Total: NT.{{total}}</p>
+            <div class="form-row mb-3">
+              <label class="form-label" for="note">Note</label>
+              <textarea class="form-control" id="note" name="note" rows="3">{{order.note}}</textarea>
+            </div>
             <div class="btn-group float-right mt-3" role="group">
               <button type="submit" class="btn btn-primary">Confirm</button>
             </div>

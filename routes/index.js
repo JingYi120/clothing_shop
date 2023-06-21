@@ -3,6 +3,7 @@ const router = express.Router()
 const clotheController = require('../controllers/clothe-controller')
 const userController = require('../controllers/user-controller')
 const orderDetailController = require('../controllers/order-detail-controller')
+const orderController = require('../controllers/order-controller')
 const passport = require('../config/passport')
 const admin = require('./modules/admin')
 const { authenticated, authenticatedAdmin } = require('../middleware/auth')
@@ -18,9 +19,13 @@ router.get('/logout', userController.logout)
 
 router.get('/orderDetails', authenticated, orderDetailController.getOrderDetails)
 router.post('/orderDetails', authenticated, orderDetailController.postOrderDetail)
-router.delete('/orderDetails/:id', orderDetailController.deleteOrderDetail)
 
-router.patch('/users/order/:id', authenticated, userController.getOrder)
+
+router.post('/orders', authenticated, orderController.postOrder)
+router.get('/orders/:id/edit', authenticated, orderController.editOrder)
+router.put('/orders/:id', authenticated, orderController.putOrder)
+
+router.get('/users/order/:id', authenticated, userController.getOrder)
 router.get('/users/:id/orders', authenticated, userController.getOrders)
 router.get('/users/:id', authenticated, userController.getUser)
 

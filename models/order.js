@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
   Order.init({
     userId: DataTypes.INTEGER,
     note: DataTypes.TEXT,
-    isDone: DataTypes.BOOLEAN
+    isDone: DataTypes.BOOLEAN,
+    isOrder: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'Order',

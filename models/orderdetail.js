@@ -18,7 +18,8 @@ module.exports = (sequelize, DataTypes) => {
   OrderDetail.init({
     orderId: DataTypes.INTEGER,
     clotheId: DataTypes.INTEGER,
-    quantity: DataTypes.INTEGER
+    quantity: DataTypes.INTEGER,
+    isOrder: DataTypes.BOOLEAN
   }, {
     sequelize,
     modelName: 'OrderDetail',

@@ -3,23 +3,36 @@ const {getUser} = require('../helpers/auth-helpers')
 
 const orderDetailController = {
   getOrderDetails: (req, res, next) => {
-    OrderDetail.findAll({
-      where: { orderId: null },
-      include: Clothe ,
-      nest: true,
-      raw: true
-    })
-    .then( orderDetails => {
-      const total = orderDetails.reduce((acc, o) => {
-        const price = Number(o.Clothe.price);
-        const quantity = Number(o.quantity);
-        return acc + price * quantity;
-      }, 0)
+    const userId  = getUser(req).id
+    return Promise.all([
+      Order.findOne({
+        where: { userId, isOrder: false },
+        include: [ 
+          { model: OrderDetail, include: Clothe }
+        ]
+      }), 
+      User.findByPk(userId)
+      ])
 
-      res.render('orderDetails', {
-        orderDetails,
-        total
-      })
+    .then(([ order, user ])=> {
+      if (!user) throw new Error("User didn't exist!")
+
+      let total = 0;
+      if (order) {
+        order.OrderDetails.forEach((orderDetail) => {
+          const price = Number(orderDetail.Clothe.price);
+          const quantity = Number(orderDetail.quantity);
+          total += price * quantity;
+        });
+
+        return res.render('orderDetails', {
+          order: order.toJSON(),
+          user: user.toJSON(),
+          userId,
+          total
+        })
+      }
+      return res.render('orderDetails')
     })
     .catch(err => next(err))
   },
@@ -28,26 +41,35 @@ const orderDetailController = {
       const { clotheId, quantity } = req.body;
       const userId = getUser(req).id
 
-
-      const [user, clothe, orderDetails] = await Promise.all([User.findByPk(userId),
+      const [user, clothe, orderDetail, order] = await Promise.all([
+        User.findByPk(userId),
         Clothe.findByPk(clotheId), 
         OrderDetail.findOne({
-          where: { orderId: null, clotheId },
-          include: Clothe
+          where: { isOrder: false, clotheId },
+          include: [Clothe,Order],
+        }), Order.findOne({
+          where: { userId, isOrder: false },
         })])
-
 
       if (!user) throw new Error("User didn't exist!")
       if (!clothe) throw new Error("Item didn't exist!")
 
-      if (orderDetails) {
-        orderDetails.quantity += Number(quantity);
-        await orderDetails.save();
+      let orderId =''
+      if (!order) {
+        const newOrder = await Order.create({ userId });
+        orderId = newOrder.id;
+      } else {
+        orderId = order.id;
+      }
+
+      if (orderDetail && orderDetail.Order.userId === userId) {
+        orderDetail.quantity += Number(quantity);
+        await orderDetail.save();
       } else {
         await OrderDetail.create({
           clotheId,
           quantity,
-          userId
+          orderId
         });
       }
 
@@ -56,16 +78,8 @@ const orderDetailController = {
     } catch (err) {
       next(err);
     }
-  },
-  deleteOrderDetail: (req, res, next) => {
-    return OrderDetail.findByPk(req.params.id)
-      .then(orderDetail => {
-        if (!orderDetail) throw new Error("Item didn't exist!")
-        return orderDetail.destroy()
-      })
-      .then(() => res.redirect('/orderDetails'))
-      .catch(err => next(err))
   }
+
 };
 
 module.exports = orderDetailController;
