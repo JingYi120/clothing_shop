@@ -1,5 +1,6 @@
-const { Clothe, Category, User, Image } = require('../models')
+const { Clothe, Category, User, Image, Order } = require('../models')
 const { imgurFileHandler } = require('../helpers/file-helpers')
+const dayjs = require('dayjs')
 
 const adminController = {
   getClothes: (req, res, next) => {
@@ -179,6 +180,42 @@ const adminController = {
       .then(() => {
         req.flash('success_messages', 'The user permissions have been successfully updated.')
         res.redirect('/admin/users')
+      })
+      .catch(err => next(err))
+  },
+  getOrders: (req, res, next) => {
+    return Order.findAll({
+      raw: true,
+      nest: true,
+      include: [User],
+      where: { isOrder: true }
+    })
+      .then(orders => {
+        const result = orders.map(order => ({
+          ...order,
+          createdAt: dayjs(order.createdAt).format('YYYY-MM-DD') + '__' + dayjs(order.createdAt).format('HH:mm:ss')
+        }))
+
+        res.render('admin/orders', { 
+          orders: result ,
+        })
+      })
+
+      .catch(err => next(err))
+  },
+  patchOrder: (req, res, next) => {
+
+    const orderId = req.params.id
+    return Order.findByPk(orderId)
+
+      .then(order => {
+        if (!order) throw new Error("Order didn't exist!")
+
+        return order.update({ isDone: !order.isDone })
+      })
+      .then(() => {
+        req.flash('success_messages', 'The order status is successfully update.')
+        res.redirect(`/users/order/${orderId}`)
       })
       .catch(err => next(err))
   }

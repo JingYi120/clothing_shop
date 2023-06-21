@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs')
 const { User, Order, OrderDetail, Clothe } = require('../models')
 const { getUser } = require('../helpers/auth-helpers')
+const dayjs = require('dayjs')
+const order = require('../models/order')
 
 const userController = {
   signUpPage: (req, res) => {
@@ -51,20 +53,26 @@ const userController = {
       .catch(err => next(err))
   },
   getOrders: (req, res, next) => {
-    return User.findByPk(req.params.id, {
-      include:  Order 
+    const userId = getUser(req).id
+    return Order.findAll({
+
+      where: { userId }
     })
-    .then(user => {
-      if (!user) throw new Error("User didn't exist!")
+    .then(orders => {
+      const result = orders.map(order => ({
+        ...order.toJSON(),
+        createdAt: dayjs(order.createdAt).format('YYYY-MM-DD') +'__'+ dayjs(order.createdAt).format('HH:mm:ss')
+      }))
 
       res.render('users/orders', {
-        user: user.toJSON(),
+        orders: result
       })
+
     })
     .catch(err => next(err))
   },
   getOrder: (req, res, next) => {
-    const userId = getUser(req).id
+    const user = getUser(req)
     return Order.findByPk(req.params.id,{ 
       include: [
         { model: OrderDetail, include: Clothe }
@@ -72,10 +80,18 @@ const userController = {
 
       .then(order => {
         if (!order) throw new Error("Order didn't exist!");
+        let total = 0;
+          order.OrderDetails.forEach((orderDetail) => {
+            const price = Number(orderDetail.Clothe.price);
+            const quantity = Number(orderDetail.quantity);
+            total += price * quantity;
+          });
+
 
         res.render('users/order', { 
           order: order.toJSON(),
-          userId
+          user,
+          total
         });
       })
       .catch(err => next(err));

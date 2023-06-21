@@ -1,0 +1,41 @@
+{{>admin-tabs route='orders'}}
+
+<br />
+<br />
+<table class="table align-middle">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Order Date</th>
+      <th scope="col">User</th>
+      <th scope="col">Status</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+  {{#each orders}}
+    <tr>
+      <th scope="row">{{this.id}}</th>
+      <td class="w-25"> {{this.createdAt}} </td>
+      <td>{{this.User.name}}</td>
+      {{#if isDone}}
+        <td>Done</td>
+      {{else}}
+        <td>Processing</td>
+      {{/if}}
+      <td>
+        <button type="button" class="btn btn-link">
+          <a class="btn btn-link link-primary" href="/users/order/{{this.id}}">
+            Details
+          </a>
+        </button>
+
+        <form action="/admin/clothes/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
+          <button type="submit" class="btn btn-link link-danger"
+            onclick="return confirm(`確定要刪除這筆資料嗎？\n ID: {{ this.id}} \n Name: {{ this.User.name }}">Delete</button>
+        </form>
+      </td>
+    </tr>
+  {{/each}}
+  </tbody>
+</table>

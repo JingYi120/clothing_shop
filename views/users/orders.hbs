@@ -10,14 +10,15 @@
     </tr>
   </thead>
   <tbody>
-    {{#each user.Orders}}
+    {{#each orders}}
+    {{#if isOrder}}
     <tr>
       <th scope="row">{{this.id}}</th>
       <td>{{this.createdAt}}</td>
       {{#if isDone}}
-      <td>處理中</td>
+      <td>Done</td>
       {{else}}
-      <td>已完成</td>
+      <td>Processing</td>
       {{/if}}
       <td>
         <button type="button" class="btn btn-link">
@@ -27,6 +28,7 @@
         </button>
       </td>
     </tr>
+    {{/if}}
     {{/each}}
   </tbody>
 </table>
