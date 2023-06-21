@@ -5,7 +5,6 @@ const categoryController = require('../../controllers/category-controller')
 const imageController = require('../../controllers/​​image-controller')
 const upload = require('../../middleware/multer')
 
-
 router.get('/clothes/create', adminController.createClothe)
 router.get('/clothes/:id/edit', adminController.editClothe)
 router.get('/clothes/:id', adminController.getClothe)

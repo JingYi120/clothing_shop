@@ -3,14 +3,23 @@ const { imgurFileHandler } = require('../helpers/file-helpers')
 const dayjs = require('dayjs')
 
 const adminController = {
-  getClothes: (req, res, next) => {
-    Clothe.findAll({
-      raw: true,
-      nest: true,
-      include: [Category]
-    })
-      .then(clothes => res.render('admin/clothes', { clothes }))
-      .catch(err => next(err))
+  getClothes: async(req, res, next) => {
+    try{
+      const categoryId = Number(req.query.categoryId) || ''
+      const [clothes, categories] = await Promise.all([Clothe.findAll({
+        raw: true,
+        nest: true,
+        include: Category,
+        where: {
+          ...categoryId ? { categoryId } : {}
+        }
+      }),
+        Category.findAll({ raw: true })
+    ])
+      res.render('admin/clothes', { clothes, categories })
+    }catch(err){
+      next(err)
+    }
   },
   createClothe: (req, res, next) => {
     return Category.findAll({
@@ -188,7 +197,11 @@ const adminController = {
       raw: true,
       nest: true,
       include: [User],
-      where: { isOrder: true }
+      where: { isOrder: true },
+      order: [
+        ['isDone', 'asc'],
+        ['createdAt', 'desc']
+      ]
     })
       .then(orders => {
         const result = orders.map(order => ({
