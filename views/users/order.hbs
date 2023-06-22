@@ -18,21 +18,21 @@
 
 <div class="card-footer">
   <p class="mb-0">Total: NT.{{total}}</p>
-  <div class="form-row mb-3">
-    <label class="form-label" for="note">Note</label>
-    <textarea class="form-control" id="note" name="note" rows="3">{{order.note}}</textarea>
+  <div class=" mb-3">
+    <p class="badge bg-danger mt-3" id="note" name="note" rows="3">Note:</p>
+    <p class="fs-5" id="note" name="note" rows="3">{{order.note}}</p>
   </div>
   <div class="d-flex justify-content-between align-items-center">
     {{#if user.isAdmin }}
     {{#if order.isDone}}
     <form action="/admin/orders/{{order.id}}?_method=PATCH" method="POST" style="display: inline;">
       <input type="hidden" name="isAdmin" value="false" />
-      <button type="submit" class="btn btn-link link-danger">Done</button>
+      <button type="submit" class="btn btn-success">Done</button>
     </form>
     {{else}}
     <form action="/admin/orders/{{order.id}}?_method=PATCH" method="POST" style="display: inline;">
       <input type="hidden" name="isAdmin" value="true" />
-      <button type="submit" class="btn btn-link link-danger">Processing</button>
+      <button type="submit" class="btn btn-info">Processing</button>
     </form>
     {{/if}}
     {{/if}}
