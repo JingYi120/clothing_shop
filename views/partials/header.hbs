@@ -1,13 +1,14 @@
 <header>
-  <nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark px-4">
+  <nav class="navbar navbar-expand-lg fixed-top navbar-dark px-4" style="background-color: #e3a5b0">
     <div class="container-fluid">
       <a class="navbar-brand" href="/">Clothing Shop</a>
       {{#if user}}
       <form class="d-flex ms-4" action="/search" method="GET">
-        <input class="form-control me-2" type="search" name="keyword" placeholder="Enter Items' name" aria-label="Search"value={{ keyword }}>
+        <input class="form-control me-2" type="search" name="keyword" placeholder="Enter Items' name"
+          aria-label="Search" value={{ keyword }}>
         <button class="btn btn-outline-light" type="submit">Search</button>
       </form>
-      
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
         aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -16,20 +17,20 @@
         <ul class="navbar-nav ms-auto mb-2 mb-md-0">
           {{#if user.isAdmin}}
           <li class="nav-item">
-            <a href="/admin" class="nav-link">Admin Panel</a>
+            <a href="/admin" class="btn btn-outline-light fs-5" style="color: #ffffff;">Admin Panel</a>
           </li>
           {{/if}}
           <li class="nav-item d-inline-flex align-items-center">
-            <span class="text-white nav-link">Hi, {{ user.name }}</span>
+            <span class="text-white nav-link fs-5">Hi, {{ user.name }}</span>
           </li>
           <a class="cart mt-2 mx-2" href="/orderDetails">
             <i class="fa-solid fa-cart-shopping fa-lg" style="color: #ffffff;"></i>
           </a>
-          <li class="nav-item">
-            <a href="/users/favorite" class="nav-link">Profile</a>
+          <li class="nav-item mx-3">
+            <a href="/users/favorite" class="btn btn-outline-light fs-5" style="color: #ffffff;">Profile</a>
           </li>
           <li class="nav-item">
-            <a href="/logout"><button class="btn btn-outline-success my-sm-0 my-2">Logout</button></a>
+            <a href="/logout" class="btn btn-outline-success my-sm-0 my-2 fs-5">Logout</a>
           </li>
         </ul>
       </div>

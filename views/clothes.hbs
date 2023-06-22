@@ -13,7 +13,7 @@
 <div class="row mt-3">
   {{#each clothes}}
   <div class="col-md-4">
-    <div class="card mb-4 shadow-sm">
+    <div class="card mb-4 shadow-sm p-3 border-3" style="border-color: #ffced9">
       <a href="/clothes/{{this.id}}">
         <img class="card-img-top img-fluid" src="{{this.Images.name}}" alt="Card image cap" width="286px" height="180px"
           style="transition: opacity 0.5s; opacity:0;" onload="this.style.opacity=1;">
@@ -28,15 +28,11 @@
         <div class="d-flex">
           {{#if isFavorited}}
           <form id="favoriteForm" action="/favorite/{{this.id}}?_method=DELETE" method="POST">
-            {{!-- <button type="submit" class="btn btn-danger m-1"> --}}
               <i class=" favoriteIcon fa-solid fa-heart fa-2xl" style="color: #d7370f;"></i>
-            {{!-- </button> --}}
           </form>
           {{else}}
           <form id="favoriteForm" action="/favorite/{{this.id}}" method="POST">
-            {{!-- <button type="submit" class="btn btn-danger m-1"> --}}
               <i class=" favoriteIcon fa-solid fa-heart fa-2xl" style="color: #b7bec8;"></i>
-            {{!-- </button> --}}
           </form>
           {{/if}}
 
