@@ -1,4 +1,4 @@
-const { Clothe, Category, Image } = require('../models')
+const { Clothe, Category, Image, User } = require('../models')
 const { getOffset, getPagination } = require('../helpers/pagination-helper')
 
 const clotheController = {
@@ -26,8 +26,14 @@ const clotheController = {
       Category.findAll({ raw: true })
     ])
       .then(([clothes,categories]) => {
+        const favoritedClothesId = req.user && req.user.FavoritedClothes.map(fi => fi.id)
+        const data = clothes.rows.map(i => ({
+          ...i,
+          isFavorited: favoritedClothesId.includes(i.id)
+        }))
+
         res.render('clothes', {
-          clothes: clothes.rows,
+          clothes: data,
           categories,
           categoryId,
           pagination: getPagination(limit, page, clothes.count)
@@ -37,11 +43,18 @@ const clotheController = {
   }, 
   getClothe: (req, res, next) => {
     return Clothe.findByPk(req.params.id, {
-      include: [Category, Image],
+      include: [
+        Category,
+        Image,
+        { model: User, as: 'FavoritedUsers' }],
     })
     .then(clothe => {
       if (!clothe) throw new Error("Item didn't exist!")
-      res.render('clothe', { clothe: clothe.toJSON() })
+      const isFavorited = clothe.FavoritedUsers.some(f => f.id === req.user.id)
+      res.render('clothe', {
+        clothe: clothe.toJSON(),
+        isFavorited
+      })
     })
     .catch(err => next(err))
   },

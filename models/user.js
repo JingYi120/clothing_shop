@@ -12,11 +12,10 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.hasMany(models.Order, { foreignKey: 'userId' })
-      User.hasMany(models.Comment, { foreignKey: 'userId' })
-      User.belongsToMany(models.Restaurant, {
+      User.belongsToMany(models.Clothe, {
         through: models.Favorite,
         foreignKey: 'userId',
-        as: 'FavoritedRestaurants'
+        as: 'FavoritedClothes'
       })
     }
   }

@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs')
-const { User, Order, OrderDetail, Clothe } = require('../models')
+const { User, Order, OrderDetail, Clothe, Favorite, Image } = require('../models')
 const { getUser } = require('../helpers/auth-helpers')
 const dayjs = require('dayjs')
 const order = require('../models/order')
@@ -46,7 +46,7 @@ const userController = {
       .then(user => {
         if (!user) throw new Error("User didn't exist!")
 
-        res.render('users/profile', {
+        res.render('partials/user-profile', {
           user: user.toJSON(),
         })
       })
@@ -95,6 +95,68 @@ const userController = {
         });
       })
       .catch(err => next(err));
+  },
+  addFavorite: (req, res, next) => {
+    const { clotheId } = req.params
+    const userId = getUser(req).id
+
+    return Promise.all([
+      Clothe.findByPk(clotheId),
+      Favorite.findOne({
+        where: {
+          userId,
+          clotheId
+        }
+      })
+    ])
+      .then(([clothe, favorite]) => {
+        if (!clothe) throw new Error("Item didn't exist!")
+        if (favorite) throw new Error('You have favorited this item!')
+
+        return Favorite.create({
+          userId,
+          clotheId
+        })
+      })
+      .then(() => res.json({ success: true }))
+      .catch(err => res.json({ success: false, message: err.message }))
+  },
+  removeFavorite: (req, res, next) => {
+    const { clotheId } = req.params
+    const userId = getUser(req).id
+
+    return Favorite.findOne({
+      where: {
+        userId,
+        clotheId
+      }
+    })
+      .then(favorite => {
+        if (!favorite) throw new Error("You haven't favorited this item")
+
+        return favorite.destroy()
+      })
+      .then(() => res.json({ success: true }))
+      .catch(err => res.json({ success: false, message: err.message }))
+  },
+  getFavorite: (req, res, next) => {
+    const userId = getUser(req).id
+    return User.findByPk(userId, {
+      include: [
+        { model: Clothe, as: 'FavoritedClothes' ,include: Image },
+        
+      ]
+    })
+      .then(user => {
+        console.log('user.toJSON().FavoritedClothes',user.toJSON().FavoritedClothes)
+        if (!user) throw new Error("User didn't exist!")
+
+        res.render('users/favorite', {
+          user: user.toJSON()
+        })
+
+      })
+      .catch(err => next(err))
   }
 }
 module.exports = userController

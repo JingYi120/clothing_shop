@@ -26,11 +26,13 @@ router.post('/orders', authenticated, orderController.postOrder)
 router.get('/orders/:id/edit', authenticated, orderController.editOrder)
 router.put('/orders/:id', authenticated, orderController.putOrder)
 
+router.get('/users/favorite', authenticated, userController.getFavorite)
 router.get('/users/order/:id', authenticated, userController.getOrder)
 router.get('/users/:id/orders', authenticated, userController.getOrders)
 router.get('/users/:id', authenticated, userController.getUser)
 
-
+router.post('/favorite/:clotheId', authenticated, userController.addFavorite)
+router.delete('/favorite/:clotheId', authenticated, userController.removeFavorite)
 
 router.get('/clothes/:id', authenticated, clotheController.getClothe)
 router.get('/clothes', authenticated, clotheController.getClothes)

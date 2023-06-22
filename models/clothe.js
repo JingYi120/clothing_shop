@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       Clothe.hasMany(models.OrderDetail, { foreignKey: 'clotheId' })
       Clothe.belongsToMany(models.User, {
         through: models.Favorite,
-        foreignKey: 'restaurantId',
+        foreignKey: 'clotheId',
         as: 'FavoritedUsers'
       })
     }
