@@ -18,7 +18,7 @@ const port = 3000
 app.engine('hbs', exphbs({ defaultLayout: 'main', extname: '.hbs', helpers: handlebarsHelpers }))
 app.set('view engine', 'hbs')
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: 'ThisIsMySecret',
   resave: false,
   saveUninitialized: true
 }))
