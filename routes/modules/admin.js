@@ -23,6 +23,7 @@ router.patch('/images/:id', imageController.patchImage)
 router.delete('/images/:id', imageController.deleteImage)
 
 router.get('/orders', adminController.getOrders)
+router.get('/orders/:id', adminController.getOrder)
 router.patch('/orders/:id', adminController.patchOrder)
 router.delete('/orders/:id', adminController.deleteOrder)
 

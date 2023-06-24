@@ -217,6 +217,27 @@ const adminController = {
       next(err)
     }
   },
+  getOrder: async (req, res, next) => {
+    try {
+      const order = await Order.findByPk(req.params.id, {
+        include: [{ model: OrderDetail, include: Clothe }]
+      })
+      if (!order) throw new Error("Order didn't exist!");
+      let total = 0;
+      order.OrderDetails.forEach((orderDetail) => {
+        const price = Number(orderDetail.Clothe.price);
+        const quantity = Number(orderDetail.quantity);
+        total += price * quantity;
+      });
+
+      res.render('admin/order', {
+        order: order.toJSON(),
+        total
+      });
+    } catch (err) {
+      next(err);
+    }
+  },
   patchOrder: async(req, res, next) => {
     try{
       const orderId = req.params.id
@@ -227,7 +248,7 @@ const adminController = {
       await order.update({ isDone: !order.isDone })
 
       req.flash('success_messages', 'The order status is successfully update.')
-      res.redirect(`/users/order/${orderId}`)
+      res.redirect(`/admin/orders/${orderId}`)
     } catch (err) {
       next(err)
     }
