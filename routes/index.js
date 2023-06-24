@@ -29,8 +29,8 @@ router.get('/orders/:id/edit', authenticated, orderController.editOrder)
 router.put('/orders/:id', authenticated, orderController.putOrder)
 
 router.get('/users/favorite', authenticated, userController.getFavorite)
-router.get('/users/order/:id', authenticated, userController.getOrder)
-router.get('/users/:id/orders', authenticated, userController.getOrders)
+router.get('/users/orders/:id', authenticated, userController.getOrder)
+router.get('/users/orders', authenticated, userController.getOrders)
 router.get('/users/:id', authenticated, userController.getUser)
 
 router.post('/favorite/:clotheId', authenticated, userController.addFavorite)
