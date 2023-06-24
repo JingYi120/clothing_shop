@@ -24,14 +24,17 @@ const imageController = {
       next(err)
     }
   },
-  deleteImage: (req, res, next) => {
-    return Image.findByPk(req.params.id)
-      .then(image => {
-        if (!image) throw new Error("Image didn't exist!")
-        return image.destroy()
-      })
-      .then(deletedImage => res.redirect(`/admin/clothes/${deletedImage.clotheId}`))
-      .catch(err => next(err))
+  deleteImage: async(req, res, next) => {
+    try{
+      const image = await Image.findByPk(req.params.id)
+
+      if (!image) throw new Error("Image didn't exist!")
+      const deletedImage = await image.destroy()
+
+      res.redirect(`/admin/clothes/${deletedImage.clotheId}`)
+    } catch (err) {
+      next(err)
+    }
   }
 };
 

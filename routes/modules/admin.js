@@ -24,6 +24,7 @@ router.delete('/images/:id', imageController.deleteImage)
 
 router.get('/orders', adminController.getOrders)
 router.patch('/orders/:id', adminController.patchOrder)
+router.delete('/orders/:id', adminController.deleteOrder)
 
 router.patch('/users/:id', adminController.patchUser)
 router.get('/users', adminController.getUsers)

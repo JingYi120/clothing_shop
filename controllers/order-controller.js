@@ -2,30 +2,27 @@ const { OrderDetail, Clothe, User, Order } = require('../models');
 const { getUser } = require('../helpers/auth-helpers')
 
 const orderController = {
-  editOrder: (req, res, next) => {
-    const userId = getUser(req).id;
-    Promise.all([
-      Order.findByPk(req.params.id, {
-        where: { userId, isOrder: false },
-        include: [
-          { model: OrderDetail, include: Clothe }
-        ]
-      }),
-      User.findByPk(userId)
-    ])
-      .then(([order, user]) => {
-        if (!user) throw new Error("User doesn't exist!");
-        if (!order) throw new Error("Order not found!");
-        
-        res.render('edit-order', {
-          order: order.toJSON(),
-          user: user.toJSON(),
-          userId,
-        });
-      })
-      .catch(err => {
-        next(err);
+  editOrder: async(req, res, next) => {
+    try{
+      const userId = getUser(req).id;
+      const [order, user] = await Promise.all([
+        Order.findByPk(req.params.id, {
+          where: { userId, isOrder: false },
+          include: { model: OrderDetail, include: Clothe }
+        }),
+        User.findByPk(userId)
+      ])
+      if (!user) throw new Error("User doesn't exist!");
+      if (!order) throw new Error("Order not found!");
+
+      res.render('edit-order', {
+        order: order.toJSON(),
+        user: user.toJSON(),
+        userId,
       });
+    } catch (err) {
+      next(err)
+    }
   },
   putOrder: async(req, res, next) => {
     try{
@@ -34,9 +31,7 @@ const orderController = {
       const orderId = req.params.id
       const order = await Order.findByPk(orderId, {
         where: { userId, isOrder: false },
-        include: [
-          { model: OrderDetail, include: Clothe }
-        ]
+        include: { model: OrderDetail, include: Clothe }
       })
 
       if (!order) throw new Error("Order doesn't exist!")
@@ -55,7 +50,6 @@ const orderController = {
       await Promise.all([...deletePromises, ...updatePromises])
 
       res.redirect(`/orderDetails`)
-
     }catch(err){
       next(err)
     }
@@ -67,7 +61,6 @@ const orderController = {
       const order = await Order.findOne({
         where: { userId, isOrder: false }
       });
-      console.log('order', order);
 
       await OrderDetail.update(
         { isOrder: true },

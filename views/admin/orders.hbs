@@ -30,9 +30,9 @@
           </a>
         </button>
 
-        <form action="/admin/clothes/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
+        <form action="/admin/orders/{{this.id}}?_method=DELETE" method="POST" style="display: inline;">
           <button type="submit" class="btn btn-link link-danger"
-            onclick="return confirm(`確定要刪除這筆資料嗎？\n ID: {{ this.id}} \n Name: {{ this.User.name }}">Delete</button>
+            onclick="return confirm(`確定要刪除這筆資料嗎？\n Order ID: {{ this.id}} \n Name: {{ this.User.name }}`)">Delete</button>
         </form>
       </td>
     </tr>

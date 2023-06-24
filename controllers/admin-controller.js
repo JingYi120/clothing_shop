@@ -1,4 +1,4 @@
-const { Clothe, Category, User, Image, Order } = require('../models')
+const { Clothe, Category, User, Image, Order, OrderDetail } = require('../models')
 const { imgurFileHandler } = require('../helpers/file-helpers')
 const dayjs = require('dayjs')
 
@@ -12,7 +12,10 @@ const adminController = {
         include: Category,
         where: {
           ...categoryId ? { categoryId } : {}
-        }
+        },
+        order: [
+          ['createdAt', 'desc']
+        ]
       }),
         Category.findAll({ raw: true })
     ])
@@ -21,25 +24,25 @@ const adminController = {
       next(err)
     }
   },
-  createClothe: (req, res, next) => {
-    return Category.findAll({
-      raw: true
-    })
-      .then(categories => res.render('admin/create-clothe', { categories }))
-      .catch(err => next(err))
+  createClothe: async(req, res, next) => {
+    try{
+      const categories = await Category.findAll({ raw: true })
+      res.render('admin/create-clothe', { categories })
+    }catch(err){
+      next(err)
+    }
   }, 
-  postClothe: async (req, res, next) => {
+  postClothe: async(req, res, next) => {
     try {
       const { name, description, price, categoryId } = req.body;
-      if (!name || !description || !price) {
-        throw new Error('All fields are required!');
-      }
+      if (!name || !description || !price) throw new Error('All fields are required!');
 
       const { files } = req;
       const { cover, image } = files;
+      const MAX_IMAGE_COUNT = 5
 
-      const coverPath = await imgurFileHandler(cover[0]);
-      const imagePaths = await Promise.all(image.map(file => imgurFileHandler(file)));
+      const coverPath = cover && cover.length > 0 ? await imgurFileHandler(cover[0]) : null
+      const imagePaths = image && image.length > 0 ?await Promise.all(image.map(file => imgurFileHandler(file))) : []
 
       const clothe = await Clothe.create({
         name,
@@ -47,13 +50,14 @@ const adminController = {
         price,
         categoryId
       });
-
-      await Image.create({
-        name: coverPath,
-        clotheId: clothe.id,
-        isCover: true
-      });
-
+      if(coverPath){
+        await Image.create({
+          name: coverPath,
+          clotheId: clothe.id,
+          isCover: true
+        });
+      }
+      
       for (let i = 0; i < imagePaths.length; i++) {
         await Image.create({
           name: imagePaths[i],
@@ -68,27 +72,29 @@ const adminController = {
       next(err);
     }
   },
-  getClothe: (req, res, next) => {
-    Clothe.findByPk(req.params.id, {
-      include: [Category, Image]
-    })
-      .then(clothe => {
-        if (!clothe) throw new Error("Item didn't exist!");
-        res.render('admin/clothe', { clothe: clothe.toJSON() });
+  getClothe: async(req, res, next) => {
+    try{
+      const clothe = await Clothe.findByPk(req.params.id, {
+        include: [Category, Image]
       })
-      .catch(err => next(err));
+      if (!clothe) throw new Error("Item didn't exist!");
+      res.render('admin/clothe', { clothe: clothe.toJSON() });
+    }catch(err){
+      next(err)
+    }
   },
-  editClothe: (req, res, next) => {
-    return Promise.all([
-      Clothe.findByPk(req.params.id, {include: Image}),
-      Category.findAll({ raw: true }),
-    ])
-    
-      .then(([clothe, categories]) => {
-        if (!clothe) throw new Error("Item didn't exist!")
-        res.render('admin/edit-clothe', { clothe: clothe.toJSON(), categories })
-      })
-      .catch(err => next(err))
+  editClothe: async(req, res, next) => {
+    try{
+      const [clothe, categories] = await Promise.all([
+        Clothe.findByPk(req.params.id, { include: Image }),
+        Category.findAll({ raw: true }),
+      ])
+
+      if (!clothe) throw new Error("Item didn't exist!")
+      res.render('admin/edit-clothe', { clothe: clothe.toJSON(), categories })
+    } catch (err) {
+      next(err)
+    }
   },
   putClothe: async (req, res, next) => {
     try {
@@ -96,14 +102,10 @@ const adminController = {
       const { files } = req;
       const { cover, image } = files;
 
-      if (!name || !description || !price) {
-        throw new Error('All fields are required!');
-      }
+      if (!name || !description || !price) throw new Error('All fields are required!');
 
       const clothe = await Clothe.findByPk(req.params.id);
-      if (!clothe) {
-        throw new Error("Item doesn't exist!");
-      }
+      if (!clothe) throw new Error("Item doesn't exist!");
 
       await clothe.update({
         name,
@@ -136,9 +138,7 @@ const adminController = {
           },
         });
 
-        if (existingImages.length + image.length > 5) {
-          throw new Error("Maximum image count reached 5");
-        }
+        if (existingImages.length + image.length > 5) throw new Error("Maximum image count reached 5");
 
         for (const file of image) {
           const imagePath = await imgurFileHandler(file);
@@ -167,70 +167,82 @@ const adminController = {
       next(err)
     }
   },
-  getUsers: (req, res, next) => {
-    return User.findAll({
-      raw: true,
-      nest: true
-    })
-      .then(users => res.render('admin/users', { users }))
-      .catch(err => next(err))
+  getUsers: async(req, res, next) => {
+    try{
+      const users = await User.findAll({
+        raw: true,
+        nest: true
+      })
+      res.render('admin/users', { users })
+    } catch (err) {
+      next(err)
+    }
   },
-  patchUser: (req, res, next) => {
-    return User.findByPk(req.params.id)
-      .then(user => {
-        if (!user) throw new Error("User didn't exist!")
-        if (user.email === 'root@example.com') {
-          req.flash('error_messages', `Prohibit changing root's permissions`)
-          return res.redirect('back')
-        }
+  patchUser: async(req, res, next) => {
+    try{
+      const user = await User.findByPk(req.params.id)
+      if (!user) throw new Error("User didn't exist!")
+      if (user.email === 'root@example.com') {
+        req.flash('error_messages', `Prohibit changing root's permissions`)
+        return res.redirect('back')
+      }
+      await user.update({ isAdmin: !user.isAdmin })
 
-        return user.update({ isAdmin: !user.isAdmin })
-      })
-      .then(() => {
-        req.flash('success_messages', 'The user permissions have been successfully updated.')
-        res.redirect('/admin/users')
-      })
-      .catch(err => next(err))
+      req.flash('success_messages', 'The user permissions have been successfully updated.')
+      res.redirect('/admin/users')
+    } catch (err) {
+      next(err)
+    }
   },
-  getOrders: (req, res, next) => {
-    return Order.findAll({
-      raw: true,
-      nest: true,
-      include: [User],
-      where: { isOrder: true },
-      order: [
-        ['isDone', 'asc'],
-        ['createdAt', 'desc']
-      ]
-    })
-      .then(orders => {
-        const result = orders.map(order => ({
-          ...order,
-          createdAt: dayjs(order.createdAt).format('YYYY-MM-DD') + '__' + dayjs(order.createdAt).format('HH:mm:ss')
-        }))
-
-        res.render('admin/orders', { 
-          orders: result ,
-        })
+  getOrders: async(req, res, next) => {
+    try{
+      const orders = await Order.findAll({
+        raw: true,
+        nest: true,
+        include: [User],
+        where: { isOrder: true },
+        order: [
+          ['isDone', 'asc'],
+          ['createdAt', 'desc']
+        ]
       })
 
-      .catch(err => next(err))
+      const result = orders.map ( order => ({
+        ...order,
+        createdAt: dayjs(order.createdAt).format('YYYY-MM-DD') + '__' + dayjs(order.createdAt).format('HH:mm:ss')
+      }))
+
+      res.render('admin/orders', { orders: result })
+    } catch (err) {
+      next(err)
+    }
   },
-  patchOrder: (req, res, next) => {
+  patchOrder: async(req, res, next) => {
+    try{
+      const orderId = req.params.id
+      const order = await Order.findByPk(orderId)
 
-    const orderId = req.params.id
-    return Order.findByPk(orderId)
+      if (!order) throw new Error("Order didn't exist!")
 
-      .then(order => {
-        if (!order) throw new Error("Order didn't exist!")
+      await order.update({ isDone: !order.isDone })
 
-        return order.update({ isDone: !order.isDone })
-      })
-      .then(() => {
-        req.flash('success_messages', 'The order status is successfully update.')
-        res.redirect(`/users/order/${orderId}`)
-      })
-      .catch(err => next(err))
+      req.flash('success_messages', 'The order status is successfully update.')
+      res.redirect(`/users/order/${orderId}`)
+    } catch (err) {
+      next(err)
+    }
+  },
+  deleteOrder: async (req, res, next) => {
+    try {
+      const orderId = req.params.id
+      const order = await Order.findByPk(orderId, { include: OrderDetail })
+      if (!order) throw new Error("Order didn't exist!")
+      await Promise.all(order.OrderDetails.map(od => od.destroy()))
+      await order.destroy()
+      res.redirect('/admin/orders')
+    } catch (err) {
+      next(err)
+    }
   }
 }
 

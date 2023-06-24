@@ -1,5 +1,5 @@
+{{#ifCond order.userId user.id}}
 <ul class="list-group list-group-flush">
-  {{#ifCond order.userId user.id}}
   {{#each order.OrderDetails}}
   <li class="list-group-item mb-3">
     <div class="d-flex justify-content-between align-items-center">
@@ -13,7 +13,6 @@
     </div>
   </li>
   {{/each}}
-  {{/ifCond}}
 </ul>
 
 <div class="card-footer">
@@ -21,6 +20,11 @@
   <div class=" mb-3">
     <p class="badge bg-danger mt-3" id="note" name="note" rows="3">Note:</p>
     <p class="fs-5" id="note" name="note" rows="3">{{order.note}}</p>
+    {{#if order.isDone}}
+    <h2>Status：Done</h2>
+    {{else}}
+    <h5>Status：Processing</h2>
+    {{/if}}
   </div>
   <div class="d-flex justify-content-between align-items-center">
     {{#if user.isAdmin }}
@@ -36,6 +40,7 @@
     </form>
     {{/if}}
     {{/if}}
-    <a class="btn btn-outline-secondary ml-auto" href="/admin/orders">Back</a>
+    <a class="btn btn-outline-secondary ml-auto" href="/users/{{user.id}}/orders">Back</a>
   </div>
 </div>
+{{/ifCond}}

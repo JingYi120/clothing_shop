@@ -2,39 +2,38 @@ const { OrderDetail, Clothe, User, Order} = require('../models');
 const {getUser} = require('../helpers/auth-helpers')
 
 const orderDetailController = {
-  getOrderDetails: (req, res, next) => {
-    const userId  = getUser(req).id
-    return Promise.all([
-      Order.findOne({
-        where: { userId, isOrder: false },
-        include: [ 
-          { model: OrderDetail, include: Clothe }
-        ]
-      }), 
-      User.findByPk(userId)
+  getOrderDetails: async(req, res, next) => {
+    try{
+      const userId = getUser(req).id
+      const [order, user] = await Promise.all([
+        Order.findOne({
+          where: { userId, isOrder: false },
+          include: { model: OrderDetail, include: Clothe }
+        }),
+        User.findByPk(userId)
       ])
 
-    .then(([ order, user ])=> {
-      if (!user) throw new Error("User didn't exist!")
+          if (!user) throw new Error("User didn't exist!")
 
-      let total = 0;
-      if (order) {
-        order.OrderDetails.forEach((orderDetail) => {
-          const price = Number(orderDetail.Clothe.price);
-          const quantity = Number(orderDetail.quantity);
-          total += price * quantity;
-        });
+          let total = 0;
+          if (order) {
+            order.OrderDetails.forEach((orderDetail) => {
+              const price = Number(orderDetail.Clothe.price);
+              const quantity = Number(orderDetail.quantity);
+              total += price * quantity;
+            });
 
-        return res.render('orderDetails', {
-          order: order.toJSON(),
-          user: user.toJSON(),
-          userId,
-          total
-        })
-      }
-      return res.render('orderDetails')
-    })
-    .catch(err => next(err))
+            return res.render('orderDetails', {
+              order: order.toJSON(),
+              user: user.toJSON(),
+              userId,
+              total
+            })
+          }
+          return res.render('orderDetails')
+    } catch (err) {
+      next(err)
+    }
   },
   postOrderDetail: async (req, res, next) => {
     try {
