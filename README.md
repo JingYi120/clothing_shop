@@ -1,7 +1,7 @@
 # Clothing Shop
 ![](public/images/index.jpg)
 
-## Introduction
+## Introduction
 
 This is an online clothing shopping website. 
 
