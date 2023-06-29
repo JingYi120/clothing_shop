@@ -61,7 +61,7 @@ const orderDetailController = {
         orderId = order.id;
       }
 
-      if (orderDetail && orderDetail.Order.userId === userId) {
+      if (orderDetail && order.userId === userId) {
         orderDetail.quantity += Number(quantity);
         await orderDetail.save();
       } else {

@@ -9,19 +9,19 @@
           </div>
           <ul class="list-group list-group-flush">
             {{#ifCond user.id userId}}
-                {{#each order.OrderDetails}}
-                  <li class="list-group-item mb-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <a class="pr-3 w-25" href="/clothes/{{this.Clothe.id}}">{{this.Clothe.name}}</a>
-                      <div class="pr-3">
-                        <span class="d-block text-primary">Quantity:{{this.quantity}}</span>
-                        <input type="hidden" name="quantity" value="{{this.quantity}}">
-                        <span class="d-block text-primary">Price: NT.{{this.Clothe.price}}</span>
-                        <input type="hidden" name="price" value="{{this.Clothe.price}}">
-                      </div>
+              {{#each order.OrderDetails}}
+                <li class="list-group-item mb-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <a class="pr-3 w-25" href="/clothes/{{this.Clothe.id}}">{{this.Clothe.name}}</a>
+                    <div class="pr-3">
+                      <span class="d-block text-primary">Quantity:{{this.quantity}}</span>
+                      <input type="hidden" name="quantity" value="{{this.quantity}}">
+                      <span class="d-block text-primary">Price: NT.{{this.Clothe.price}}</span>
+                      <input type="hidden" name="price" value="{{this.Clothe.price}}">
                     </div>
-                  </li>
-                {{/each}}
+                  </div>
+                </li>
+              {{/each}}
             {{/ifCond}}
           </ul>
           <div class="card-footer">

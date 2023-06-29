@@ -39,10 +39,15 @@ const adminController = {
 
       const { files } = req;
       const { cover, image } = files;
-      const MAX_IMAGE_COUNT = 5
 
       const coverPath = cover && cover.length > 0 ? await imgurFileHandler(cover[0]) : null
       const imagePaths = image && image.length > 0 ?await Promise.all(image.map(file => imgurFileHandler(file))) : []
+
+      const clothes = await Clothe.findAll({ raw: true })
+      const isClotheExists = clothes.some(cat => cat.name === name);
+      if (isClotheExists) {
+        throw new Error(`This name has already been created.`);
+      }
 
       const clothe = await Clothe.create({
         name,
@@ -104,8 +109,16 @@ const adminController = {
 
       if (!name || !description || !price) throw new Error('All fields are required!');
 
-      const clothe = await Clothe.findByPk(req.params.id);
+      const [clothe, clothes] = await Promise.all([
+        Clothe.findByPk(req.params.id),
+        Clothe.findAll({ raw: true })
+      ]) ;
+
       if (!clothe) throw new Error("Item doesn't exist!");
+      const isClotheExists = clothes.some(cat => cat.name === name);
+      if (isClotheExists) {
+        throw new Error(`This name has already been created.`);
+      }
 
       await clothe.update({
         name,
@@ -203,7 +216,7 @@ const adminController = {
         where: { isOrder: true },
         order: [
           ['isDone', 'asc'],
-          ['createdAt', 'desc']
+          ['createdAt', 'asc']
         ]
       })
 

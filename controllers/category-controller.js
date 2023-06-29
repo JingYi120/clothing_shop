@@ -16,6 +16,10 @@ const categoryController = {
     try{
       const { name } = req.body
       if (!name) throw new Error('Category name is required!')
+      const isCategoryExists = categories.some(cat => cat.name === name);
+      if (isCategoryExists) {
+        throw new Error('This category has already been created.');
+      }
       await Category.create({ name })
       res.redirect('/admin/categories')
     } catch (err) {
@@ -29,6 +33,11 @@ const categoryController = {
 
       const category = await Category.findByPk(req.params.id)
       if (!category) throw new Error("Category doesn't exist!")
+
+      const isCategoryExists = categories.some(cat => cat.name === name);
+      if (isCategoryExists) {
+        throw new Error('This category has already been created.');
+      }
 
       await category.update({ name })
 
