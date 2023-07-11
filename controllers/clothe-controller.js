@@ -63,7 +63,7 @@ const clotheController = {
       const page = Number(req.query.page) || 1
       const limit = Number(req.query.limit) || DEFAULT_LIMIT
       const offset = getOffset(limit, page)
-      const clothes = Clothe.findAndCountAll({
+      const clothes = await Clothe.findAndCountAll({
         include: Category,
         include: { model: Image, where: { isCover: true }},
         limit,
