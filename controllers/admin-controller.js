@@ -115,7 +115,7 @@ const adminController = {
       ]) ;
 
       if (!clothe) throw new Error("Item doesn't exist!");
-      const isClotheExists = clothes.some(cat => cat.name === name);
+      const isClotheExists = clothes.some(item => item.name === name && item.id.toString() !== req.params.id);
       if (isClotheExists) {
         throw new Error(`This name has already been created.`);
       }
