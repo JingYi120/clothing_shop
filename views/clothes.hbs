@@ -27,11 +27,11 @@
         <p class="card-text text-truncate">NT. {{this.price}}</p>
         <div class="d-flex">
           {{#if isFavorited}}
-          <form id="favoriteForm" action="/favorite/{{this.id}}?_method=DELETE" method="POST">
+          <form id="favoriteForm" action="/favorite/{{this.id}}" method="POST" data-is-favorited="true">
               <i class=" favoriteIcon fa-solid fa-heart fa-2xl" style="color: #d7370f;"></i>
           </form>
           {{else}}
-          <form id="favoriteForm" action="/favorite/{{this.id}}" method="POST">
+          <form id="favoriteForm" action="/favorite/{{this.id}}" method="POST" data-is-favorited="false">
               <i class=" favoriteIcon fa-solid fa-heart fa-2xl" style="color: #b7bec8;"></i>
           </form>
           {{/if}}

@@ -18,11 +18,11 @@
       <div class="d-flex align-items-center">
       <h2 class="mx-3">{{clothe.name}}</h2>
       {{#if isFavorited }}
-      <form action="/favorite/{{clothe.id}}?_method=DELETE" method="POST" style="display: contents;">
+      <form action="/favorite/{{clothe.id}}" method="POST" style="display: contents;" data-is-favorited="true">
           <i class=" favoriteIcon fa-solid fa-heart fa-2xl" style="color: #d7370f;"></i>
       </form>
       {{else}}
-      <form action="/favorite/{{clothe.id}}" method="POST" style="display: contents;">
+      <form action="/favorite/{{clothe.id}}" method="POST" style="display: contents;" data-is-favorited="false">
           <i class=" favoriteIcon fa-solid fa-heart fa-2xl" style="color: #b7bec8;"></i>
       </form>
       {{/if}}
