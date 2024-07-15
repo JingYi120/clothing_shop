@@ -74,8 +74,8 @@ Admin Orders Page
    ```
 7. Create tables and seeders
    ```
-   sequelize db:migrate
-   sequelize db:seed:all
+   npx sequelize db:migrate
+   npx sequelize db:seed:all
    ```
 8. Start the server
    ```
