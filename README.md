@@ -85,8 +85,8 @@ Admin Orders Page
 9. You can use the account and password to log in and experience the website.:
    | Role | account  | password |
    | --- | --- | --- |
-   | Admin | root@example.com.tw | 12345678 |
-   | Customer | user1@example.com.tw  | 12345678 |
+   | Admin | root@example.com | 12345678 |
+   | Customer | user1@example.com  | 12345678 |
 10. stop server
     ```
     ctrl + c
