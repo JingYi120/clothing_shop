@@ -27,6 +27,8 @@ router.get('/orders/:id', adminController.getOrder)
 router.patch('/orders/:id', adminController.patchOrder)
 router.delete('/orders/:id', adminController.deleteOrder)
 
+router.get("/sales", adminController.getSales)
+
 router.patch('/users/:id', adminController.patchUser)
 router.get('/users', adminController.getUsers)
 

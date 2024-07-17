@@ -1,0 +1,228 @@
+{{>admin-tabs route='sales'}}
+
+<div class="container my-4">
+  <div class="row mb-3 align-items-end">
+    <div class="col-md-2">
+      <label for="viewType" class="form-label">View Type</label>
+      <select id="viewType" class="form-select">
+        <option value="daily">Daily View</option>
+        <option value="quarterly">Quarterly View</option>
+        <option value="yearly">Yearly View</option>
+      </select>
+    </div>
+    <div class="col-md-3" id="dateRangeSelector">
+      <label for="startDate" class="form-label">Start Date</label>
+      <input type="date" id="startDate" class="form-control">
+    </div>
+    <div class="col-md-3" id="dateRangeSelectorEnd">
+      <label for="endDate" class="form-label">End Date</label>
+      <input type="date" id="endDate" class="form-control">
+    </div>
+    <div class="col-md-3" id="quarterSelector" style="display: none">
+      <label for="quarterPicker" class="form-label">Quarter</label>
+      <select id="quarterPicker" class="form-select">
+        <option value="Q1">Q1</option>
+        <option value="Q2">Q2</option>
+        <option value="Q3">Q3</option>
+        <option value="Q4">Q4</option>
+      </select>
+    </div>
+    <div class="col-md-2" id="quarterYearSelector">
+      <label for="quarterYearPicker" class="form-label">Year</label>
+      <input type="number" id="quarterYearPicker" class="form-control" min="2000" max="2099" step="1">
+    </div>
+    <div class="col-md-2" id="yearSelector" style="display: none">
+      <label for="yearPicker" class="form-label">Year</label>
+      <input type="number" id="yearPicker" class="form-control" min="2000" max="2099" step="1">
+    </div>
+    <div class="col-md-1">
+      <button id="updateChart" class="btn btn-primary w-100">Search</button>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-md-12 text-end">
+      <h3 id="totalAmount" class="mb-0">Total: $0</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <canvas id="salesChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs"></script>
+<script>
+  const salesData = {{{salesData}}}
+  let chart
+
+  function getDatesInRange(start, end) {
+    const dates = []
+    let currentDate = dayjs(start)
+    const stopDate = dayjs(end)
+    while (currentDate.isBefore(stopDate) || currentDate.isSame(stopDate)) {
+      dates.push(currentDate.format('YYYY-MM-DD'))
+      currentDate = currentDate.add(1, 'day')
+    }
+    return dates
+  }
+
+  function getMonthsInRange(start, end) {
+    const months = []
+    let currentDate = dayjs(start)
+    const stopDate = dayjs(end)
+    while (currentDate.isBefore(stopDate) || currentDate.isSame(stopDate)) {
+      months.push(currentDate.format('YYYY-MM'))
+      currentDate = currentDate.add(1, 'month')
+    }
+    return months
+  }
+
+  function updateChart() {
+    const ctx = document.getElementById('salesChart').getContext('2d')
+    const viewType = document.getElementById('viewType').value
+    let data, labels, values
+
+    switch (viewType) {
+      case 'daily':
+        const startDate = document.getElementById('startDate').value
+        const endDate = document.getElementById('endDate').value
+        labels = getDatesInRange(startDate, endDate)
+        data = labels.reduce((acc, date) => {
+          acc[date] = salesData.daily[date] || 0
+          return acc
+        }, {})
+        break
+      case 'quarterly':
+        const selectedQuarter = document.getElementById('quarterPicker').value
+        const selectedQuarterYear = document.getElementById('quarterYearPicker').value || dayjs().year()
+        const quarterMonths = {
+          'Q1': ['01', '02', '03'],
+          'Q2': ['04', '05', '06'],
+          'Q3': ['07', '08', '09'],
+          'Q4': ['10', '11', '12']
+        }
+        labels = quarterMonths[selectedQuarter].map(month => `${selectedQuarterYear}-${month}`)
+        data = labels.reduce((acc, month) => {
+          acc[month] = salesData.monthly[month] || 0
+          return acc
+        }, {})
+        break
+      case 'yearly':
+        const selectedYear = document.getElementById('yearPicker').value
+        labels = getMonthsInRange(dayjs(selectedYear).startOf('year'), dayjs(selectedYear).endOf('year'))
+        data = labels.reduce((acc, month) => {
+          acc[month] = salesData.monthly[month] || 0
+          return acc
+        }, {})
+        break
+    }
+
+    values = Object.values(data)
+
+    const total = values.reduce((sum, value) => sum + value, 0)
+    document.getElementById('totalAmount').textContent = `Total: $${total.toLocaleString()}`
+
+    if (chart) {
+      chart.destroy()
+    }
+
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: `${viewType.charAt(0).toUpperCase() + viewType.slice(1)} Sales`,
+          data: values,
+          backgroundColor: 'rgba(75, 192, 192, 0.6)',
+          borderColor: 'rgba(75, 192, 192, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Sales Amount'
+            },
+            ticks: {
+              callback: (value) => `$${value.toLocaleString()}`
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: viewType === 'daily' ? 'Date' : 'Month'
+            }
+          }
+        },
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: `${viewType.charAt(0).toUpperCase() + viewType.slice(1)} Sales Chart`
+          },
+          datalabels: {
+            display: true,
+            color: 'black',
+            anchor: 'end',
+            align: 'top',
+            formatter: (value) => `$${value.toLocaleString()}`,
+            font: {
+              size: 14,
+              weight: 'bold',
+            }
+          }
+        }
+      },
+      plugins: [ChartDataLabels]
+    })
+  }
+
+  document.getElementById('viewType').addEventListener('change', function() {
+  document.getElementById('dateRangeSelector').style.display = 'none'
+  document.getElementById('dateRangeSelectorEnd').style.display = 'none'
+  document.getElementById('quarterSelector').style.display = 'none'
+  document.getElementById('quarterYearSelector').style.display = 'none'
+  document.getElementById('yearSelector').style.display = 'none'
+
+  switch (this.value) {
+    case 'daily':
+      document.getElementById('dateRangeSelector').style.display = 'block'
+      document.getElementById('dateRangeSelectorEnd').style.display = 'block'
+      break
+    case 'quarterly':
+      document.getElementById('quarterSelector').style.display = 'block'
+      document.getElementById('quarterYearSelector').style.display = 'block'
+      break
+    case 'yearly':
+      document.getElementById('yearSelector').style.display = 'block'
+      break
+    }
+  })
+
+  document.getElementById('updateChart').addEventListener('click', updateChart)
+
+  const today = dayjs()
+  const firstDayOfMonth = today.startOf('month')
+  const lastDayOfMonth = today.endOf('month')
+
+  document.getElementById('startDate').value = firstDayOfMonth.format('YYYY-MM-DD')
+  document.getElementById('endDate').value = lastDayOfMonth.format('YYYY-MM-DD')
+  document.getElementById('quarterYearPicker').value = today.year()
+  document.getElementById('yearPicker').value = today.year()
+
+  document.getElementById('startDate').addEventListener('change', function() {
+    const startDate = dayjs(this.value)
+    const maxEndDate = startDate.add(30, 'day')
+    document.getElementById('endDate').max = maxEndDate.format('YYYY-MM-DD')
+  })
+
+  document.getElementById('viewType').dispatchEvent(new Event('change'))
+
+  updateChart()
+</script>
