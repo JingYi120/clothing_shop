@@ -1,6 +1,7 @@
-const { Clothe, Category, User, Image, Order, OrderDetail } = require('../models')
-const { imgurFileHandler } = require('../helpers/file-helpers')
-const dayjs = require('dayjs')
+const { Clothe, Category, User, Image, Order, OrderDetail } = require("../models")
+const { imgurFileHandler } = require("../helpers/file-helpers")
+const dayjs = require("dayjs")
+const { Op } = require("sequelize")
 
 const adminController = {
   getClothes: async (req, res, next) => {
@@ -274,26 +275,18 @@ const adminController = {
       next(err)
     }
   },
-  getSales: async (req, res, next) => {
+  getChartSales: async (req, res, next) => {
     try {
       const orders = await Order.findAll({
         include: [{ model: OrderDetail, include: Clothe }],
         where: { isOrder: true },
-        order: [
-          ["updatedAt", "asc"],
-        ],
+        order: [["updatedAt", "asc"]],
       })
       const salesData = orders.reduce(
         (acc, order) => {
-          console.log("acc:", acc)
           const day = dayjs(order.updatedAt).format("YYYY-MM-DD")
-          console.log("day", day)
           const month = dayjs(order.updatedAt).format("YYYY-MM")
-          console.log("month", month)
-
-          console.log("acc.daily[day]",acc.daily[day])
           if (!acc.daily[day]) acc.daily[day] = 0
-          console.log("acc.monthly[month]", acc.monthly[month])
           if (!acc.monthly[month]) acc.monthly[month] = 0
 
           const total = order.OrderDetails.reduce(
@@ -309,9 +302,154 @@ const adminController = {
         { daily: {}, monthly: {} }
       )
 
-      console.log("salesData", salesData)
-      res.render("admin/sales", {
+      res.render("admin/sales-chart", {
         salesData: JSON.stringify(salesData),
+      })
+    } catch (err) {
+      next(err)
+    }
+  },
+  getReportSales: async (req, res, next) => {
+    try {
+      const today = dayjs().format('YYYY-MM-DD')
+      const formattedStartDate = today ? `${today} 00:00:00` : null
+      const formattedEndDate = today ? `${today} 23:59:59` : null
+      const categoryId = Number(req.query.categoryId) || ""
+      const [orders, categories] = await Promise.all([
+        Order.findAll({
+          include: [
+            {
+              model: OrderDetail,
+              include: [
+                {
+                  model: Clothe,
+                  include: [Category],
+                },
+              ],
+            },
+          ],
+          where: {
+            isOrder: true,
+            updatedAt: {
+              [Op.gte]: formattedStartDate,
+              [Op.lte]: formattedEndDate,
+            },
+          },
+        }),
+        Category.findAll({ raw: true }),
+      ])
+
+      let clothingStats = {}
+      orders.forEach((order) => {
+        order.OrderDetails.forEach((orderDetail) => {
+          const clotheId = orderDetail.clotheId
+          const quantity = orderDetail.quantity
+          const price = orderDetail.Clothe.price
+          const clotheCategoryId = orderDetail.Clothe.Category.id
+
+          if (categoryId && clotheCategoryId !== categoryId) return
+
+          if (!clothingStats[clotheId]) {
+            clothingStats[clotheId] = {
+              quantity: 0,
+              totalSales: 0,
+              Clothe: orderDetail.Clothe.toJSON(),
+            }
+          }
+
+          clothingStats[clotheId].quantity += quantity
+          clothingStats[clotheId].totalSales += quantity * price
+        })
+      })
+
+      const sortedClothingStats = Object.values(clothingStats)
+        .sort((a, b) => b.quantity - a.quantity || b.totalSales - a.totalSales)
+        .map((item, index) => ({ ...item, index: index + 1 }))
+
+      const totalAmount = sortedClothingStats.reduce((acc, i) => {
+        return acc + i.totalSales
+      }, 0)
+
+
+      res.render("admin/sales-report", {
+        sortedClothingStats: sortedClothingStats,
+        totalAmount,
+        categoryId,
+        categories,
+        today,
+      })
+    } catch (err) {
+      next(err)
+    }
+  },
+  getReportSalesSearch: async (req, res, next) => {
+    try {
+      const { startDate, endDate } = req.query
+      const formattedStartDate = startDate ? `${startDate} 00:00:00` : null
+      const formattedEndDate = endDate ? `${endDate} 23:59:59` : null
+      const categoryId = Number(req.query.categoryId) || ""
+      const [orders, categories] = await Promise.all([
+        Order.findAll({
+          include: [
+            {
+              model: OrderDetail,
+              include: [
+                {
+                  model: Clothe,
+                  include: [Category],
+                },
+              ],
+            },
+          ],
+          where: {
+            isOrder: true,
+            updatedAt: {
+              [Op.gte]: formattedStartDate,
+              [Op.lte]: formattedEndDate,
+            },
+          },
+        }),
+        Category.findAll({ raw: true }),
+      ])
+
+      let clothingStats = {}
+      orders.forEach((order) => {
+        order.OrderDetails.forEach((orderDetail) => {
+          const clotheId = orderDetail.clotheId
+          const quantity = orderDetail.quantity
+          const price = orderDetail.Clothe.price
+          const clotheCategoryId = orderDetail.Clothe.Category.id
+
+          if (categoryId && clotheCategoryId !== categoryId) return
+
+          if (!clothingStats[clotheId]) {
+            clothingStats[clotheId] = {
+              quantity: 0,
+              totalSales: 0,
+              Clothe: orderDetail.Clothe.toJSON(),
+            }
+          }
+
+          clothingStats[clotheId].quantity += quantity
+          clothingStats[clotheId].totalSales += quantity * price
+        })
+      })
+
+      const sortedClothingStats = Object.values(clothingStats)
+        .sort((a, b) => b.quantity - a.quantity || b.totalSales - a.totalSales)
+        .map((item, index) => ({ ...item, index: index + 1 }))
+
+      const totalAmount = sortedClothingStats.reduce((acc, i) => {
+        return acc + i.totalSales
+      }, 0)
+
+      res.render("admin/sales-report-search", {
+        sortedClothingStats: sortedClothingStats,
+        totalAmount,
+        categoryId,
+        categories,
+        startDate,
+        endDate,
       })
     } catch (err) {
       next(err)

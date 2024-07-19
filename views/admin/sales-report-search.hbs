@@ -1,0 +1,63 @@
+{{>admin-tabs route='sales/chart'}}
+{{>admin-sales-tabs route='sales/report'}}
+
+<br />
+<br />
+<div class="row mb-3 align-items-end">
+  <form class="d-flex ms-4" action="/admin/sales/report/search" method="GET">
+    <div class="col-md-3 pe-3" id="dateRangeSelector">
+      <label for="startDate" class="form-label">Start Date</label>
+      <input type="date" id="startDate" class="form-control" name="startDate" value="{{startDate}}">
+    </div>
+    <div class="col-md-3 pe-3" id="dateRangeSelectorEnd">
+      <label for="endDate" class="form-label">End Date</label>
+      <input type="date" id="endDate" class="form-control" name="endDate" value="{{endDate}}">
+    </div>
+    <div class="col-md-1 align-self-end ">
+      <button id="updateChart" class="btn btn-primary w-100 " type="submit">Search</button>
+    </div>
+  </form>
+</div>
+<div class="row mb-3">
+  <div class="col-md-12 text-end">
+    <h3 id="totalAmount" class="mb-0">Total: NT.{{totalAmount}}</h3>
+  </div>
+</div>
+<table class="table align-middle">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Name</th>
+      <th scope="col">Price</th>
+      <th scope="col">
+        <div class="dropdown">
+          <button class="btn btn-primary dropdown-toggle" type="button" id="categoryDropdown" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            Select Category
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="categoryDropdown">
+            <li><a class="dropdown-item {{#ifCond '' categoryId}}active{{/ifCond}}" href="?&startDate={{startDate}}&endDate={{endDate}}&categoryId=">All Items</a></li>
+            {{#each categories}}
+            <li><a class="dropdown-item {{#ifCond this.id ../sortedClothingStats.Clothe.categoryId}}active{{/ifCond}}" href="?categoryId={{this.id}}&startDate={{../startDate}}&endDate={{../endDate}}">{{ this.name }}</a></li>
+            {{/each}}
+
+          </ul>
+        </div>
+      </th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Total Sales</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each sortedClothingStats}}
+    <tr>
+      <th scope="row">{{this.index}}</th>
+      <td>{{this.Clothe.name}}</td>
+      <td>NT${{this.Clothe.price}}</td>
+      <td>{{this.Clothe.Category.name}}</td>
+      <td>{{this.quantity}}</td>
+      <td>NT${{this.totalSales}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
