@@ -1,4 +1,5 @@
-{{>admin-tabs route='sales'}}
+{{>admin-tabs route='sales/chart'}}
+{{>admin-sales-tabs route='sales/chart'}}
 
 <div class="container my-4">
   <div class="row mb-3 align-items-end">
@@ -35,13 +36,13 @@
       <label for="yearPicker" class="form-label">Year</label>
       <input type="number" id="yearPicker" class="form-control" min="2000" max="2099" step="1">
     </div>
-    <div class="col-md-1">
-      <button id="updateChart" class="btn btn-primary w-100">Search</button>
+    <div class="col-xl-1 col-12 d-xl-flex flex-column">
+      <button id="updateChart" class="btn btn-primary w-100" type="submit">Search</button>
     </div>
   </div>
   <div class="row mb-3">
     <div class="col-md-12 text-end">
-      <h3 id="totalAmount" class="mb-0">Total: $0</h3>
+      <h3 id="totalAmount" class="mb-0">Total: NT.0</h3>
     </div>
   </div>
   <div class="row">
@@ -123,7 +124,7 @@
     values = Object.values(data)
 
     const total = values.reduce((sum, value) => sum + value, 0)
-    document.getElementById('totalAmount').textContent = `Total: $${total.toLocaleString()}`
+    document.getElementById('totalAmount').textContent = `Total: NT.${total.toLocaleString()}`
 
     if (chart) {
       chart.destroy()
@@ -150,7 +151,7 @@
               text: 'Sales Amount'
             },
             ticks: {
-              callback: (value) => `$${value.toLocaleString()}`
+              callback: (value) => `NT.${value.toLocaleString()}`
             }
           },
           x: {
@@ -171,7 +172,7 @@
             color: 'black',
             anchor: 'end',
             align: 'top',
-            formatter: (value) => `$${value.toLocaleString()}`,
+            formatter: (value) => `NT.${value.toLocaleString()}`,
             font: {
               size: 14,
               weight: 'bold',
