@@ -2,7 +2,7 @@
 {{>admin-sales-tabs route='sales/report'}}
 
 <div class="row mb-3 align-items-end">
-  <form class="d-flex ms-4" action="/admin/sales/report/search" method="GET">
+  <form class="d-flex align-items-end" action="/admin/sales/report/search" method="GET">
     <div class="col-md-3 pe-3" id="dateRangeSelector">
       <label for="startDate" class="form-label">Start Date</label>
       <input type="date" id="startDate" class="form-control" name="startDate" value="{{today}}">
@@ -11,8 +11,19 @@
       <label for="endDate" class="form-label">End Date</label>
       <input type="date" id="endDate" class="form-control" name="endDate" value="{{today}}">
     </div>
-    <div class="col-md-1 align-self-end ">
-      <button id="updateChart" class="btn btn-primary w-100 " type="submit">Search</button>
+    <div class="col-md-2 pe-3">
+      <button id="updateChart" class="btn btn-primary w-100" type="submit">Search</button>
+    </div>
+    <div class="col-md-2">
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle w-100" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+          Export
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="exportDropdown">
+          <li><a class="dropdown-item" href="?exportType=excel&startDate={{startDate}}&endDate={{endDate}}&categoryId={{categoryId}}">Excel</a></li>
+          <li><a class="dropdown-item" href="?exportType=csv&startDate={{startDate}}&endDate={{endDate}}&categoryId={{categoryId}}">CSV</a></li>
+        </ul>
+      </div>
     </div>
   </form>
 </div>

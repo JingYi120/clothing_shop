@@ -1,11 +1,10 @@
 # Clothing Shop
+
 ![](public/images/index.jpg)
 
 ## Introduction
 
-This is an online clothing shopping website. 
-
-
+This is an online clothing shopping website.
 
 ## Features
 
@@ -21,7 +20,8 @@ This is an online clothing shopping website.
 - On clothes page, admin can create a new product, edit the product or change the cover photo of product, delete the product. Also can select the category to check the product of the category.
 - On users page, admin can set the account to the user or admin except the certain account(root@example.com.tw) can not set to the user.
 - On the categories page, admin can create, edit, delete the category.
-- On the orders page, admin can check the customers orders are "Processing" or "Done". Check the detail order can change the status of the order. 
+- On the orders page, admin can check the customers orders are "Processing" or "Done". Check the detail order can change the status of the order.
+- On the Sales Analysis page, admin can search for chart analyses or reports from any time period, and can also export reports in Excel or CSV.
 
 Admin Clothes Page
 ![](public/images/admin_clothes.jpg)![](public/images/admin_clothe_show.jpg)![](public/images/admin_clothe_edit.jpg)
@@ -31,6 +31,8 @@ Admin Categories Page
 ![](public/images/admin_categories.jpg)
 Admin Orders Page
 ![](public/images/admin_orers.jpg)![](public/images/admin_order.jpg)
+Admin Sales Analysis Page
+![](public/images/clothe_sales_chart.png)![](public/images/clothe_sales_report.png)
 
 **Customer**
 
@@ -83,10 +85,10 @@ Admin Orders Page
    ```
    It's successful that terminal show "Express is listening on http://localhost:3000"
 9. You can use the account and password to log in and experience the website.:
-   | Role | account  | password |
+   | Role | account | password |
    | --- | --- | --- |
    | Admin | root@example.com | 12345678 |
-   | Customer | user1@example.com  | 12345678 |
+   | Customer | user1@example.com | 12345678 |
 10. stop server
     ```
     ctrl + c

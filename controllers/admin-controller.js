@@ -2,6 +2,7 @@ const { Clothe, Category, User, Image, Order, OrderDetail } = require("../models
 const { imgurFileHandler } = require("../helpers/file-helpers")
 const dayjs = require("dayjs")
 const { Op } = require("sequelize")
+const exportServices = require("../services/export/export.js")
 
 const adminController = {
   getClothes: async (req, res, next) => {
@@ -311,10 +312,11 @@ const adminController = {
   },
   getReportSales: async (req, res, next) => {
     try {
-      const today = dayjs().format('YYYY-MM-DD')
+      const today = dayjs().format("YYYY-MM-DD")
       const formattedStartDate = today ? `${today} 00:00:00` : null
       const formattedEndDate = today ? `${today} 23:59:59` : null
       const categoryId = Number(req.query.categoryId) || ""
+      const { exportType } = req.query
       const [orders, categories] = await Promise.all([
         Order.findAll({
           include: [
@@ -370,6 +372,32 @@ const adminController = {
         return acc + i.totalSales
       }, 0)
 
+      if (exportType === "excel" || exportType === "csv") {
+        const data = sortedClothingStats.map((item) => ({
+          "#": item.index,
+          Name: item.Clothe.name,
+          Price: `${item.Clothe.price}`,
+          Category: item.Clothe.Category.name,
+          Quantity: item.quantity,
+          "Total Sales": `${item.totalSales}`,
+        }))
+
+        data.push({
+          "#": "",
+          Name: "",
+          Price: "",
+          Category: "",
+          Quantity: "Total",
+          "Total Sales": `${totalAmount}`,
+        })
+
+        if (exportType === "excel") {
+          await exportServices.exportToExcel(res, data)
+        } else {
+          await exportServices.exportToCsv(res, data)
+        }
+        return
+      }
 
       res.render("admin/sales-report", {
         sortedClothingStats: sortedClothingStats,
@@ -384,7 +412,7 @@ const adminController = {
   },
   getReportSalesSearch: async (req, res, next) => {
     try {
-      const { startDate, endDate } = req.query
+      const { startDate, endDate, exportType } = req.query
       const formattedStartDate = startDate ? `${startDate} 00:00:00` : null
       const formattedEndDate = endDate ? `${endDate} 23:59:59` : null
       const categoryId = Number(req.query.categoryId) || ""
@@ -442,6 +470,32 @@ const adminController = {
       const totalAmount = sortedClothingStats.reduce((acc, i) => {
         return acc + i.totalSales
       }, 0)
+      if (exportType === "excel" || exportType === "csv") {
+        const data = sortedClothingStats.map((item) => ({
+          "#": item.index,
+          Name: item.Clothe.name,
+          Price: `${item.Clothe.price}`,
+          Category: item.Clothe.Category.name,
+          Quantity: item.quantity,
+          "Total Sales": `${item.totalSales}`,
+        }))
+
+        data.push({
+          "#": "",
+          Name: "",
+          Price: "",
+          Category: "",
+          Quantity: "Total(NT.)",
+          "Total Sales": `${totalAmount}`,
+        })
+
+        if (exportType === "excel") {
+          await exportServices.exportToExcel(res, data)
+        } else {
+          await exportServices.exportToCsv(res, data)
+        }
+        return
+      }
 
       res.render("admin/sales-report-search", {
         sortedClothingStats: sortedClothingStats,
